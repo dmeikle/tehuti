@@ -1,0 +1,41 @@
+## YAML Template.
+---
+
+server:
+    host: 192.168.2.252
+    port: 9000
+    listeners:
+        - { 'event': 'server_initiate', 'listener': '\Gossamer\Sockets\EventListeners\ServerEventListener' }
+        - { 'event': 'server_startup', 'listener': '\Gossamer\Sockets\EventListeners\ServerEventListener' }
+        - { 'event': 'client_server_connect', 'listener': '\Gossamer\Sockets\EventListeners\CheckServerCredentialsListener' }
+        - { 'event': 'client_server_request', 'listener': '\Gossamer\Sockets\EventListeners\GetServerRequestListener' }
+client:
+    listeners:
+        - { 'event': 'client_connect', 'listener': '\Gossamer\Sockets\EventListeners\CheckClientCredentialsListener' }
+        
+        
+#this is an afterthought. Originally the system was written with Monolog\Logger
+#being a pervasive aspect of the logging. In hindsight this should have been
+#simply an Adapter Pattern. Putting this configuration in is an initial step
+#towards implementing a logging class behind an adapter method
+logger:
+    class: Monolog\Logger
+    handler:
+        #use this one to make a log that never rotates
+        #class: Monolog\Handler\StreamHandler
+        
+        #use this one to rotate the logs every day
+        class: Monolog\Handler\RotatingFileHandler 
+        #use this for RotatingFileHandler only. Comment out if using standard StreamHandler
+        maxfiles: 14
+        
+        logfile: monolog.log
+        loglevel: 100
+#        100 => 'DEBUG',
+#        200 => 'INFO',
+#        250 => 'NOTICE',
+#        300 => 'WARNING',
+#        400 => 'ERROR',
+#        500 => 'CRITICAL',
+#        550 => 'ALERT',
+#        600 => 'EMERGENCY'        

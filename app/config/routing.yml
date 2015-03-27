@@ -1,0 +1,11 @@
+
+
+
+
+
+tokens:
+    component: "src/framework/components/tokens/config/routing.yml"
+    
+
+staff:
+    component: "src/framework/components/staff/config/routing.yml"    

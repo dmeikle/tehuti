@@ -8,22 +8,34 @@
  *  For the full copyright and license information, please view the LICENSE
  *  file that was distributed with this source code.
  */
-namespace tests\Gossamer\Tehuti\Core;
+namespace Gossamer\Tehuti\Routing;
 
+use Gossamer\Tehuti\Routing\ServiceRouter;
 use Gossamer\Tehuti\Core\SocketRequest;
+use Gossamer\Tehuti\Utils\YAMLParser;
+use Gossamer\Tehuti\Utils\Container;
+use Gossamer\Horus\EventListeners\EventDispatcher;
+use Gossamer\Horus\Core\Request;
 
 /**
- * SocketRequest
+ * ServiceRouterTest
  *
  * @author Dave Meikle
  */
-class SocketRequestTest extends \tests\BaseTest {
+class ServiceRouterTest extends \tests\BaseTest{
     
-    public function testConstruct() {
-        $request = new SocketRequest($this->getHeader());
+    
+    public function testGetHandler() {
+        $router = new ServiceRouter(new YAMLParser());
+        $container = new Container($this->getLogger());
+        $container->set('EventDispatcher', null, new EventDispatcher(array(), $this->getLogger(), new Request($this->getHeader())));
+        $container->set('Logger', null, $this->getLogger());
+        $router->setContainer($container);
+        echo $router->handleRequest(new SocketRequest($this->getHeader()));
         
-       // print_r($request);
     }
+
+  
     
     private function getHeader() {
         $host = 'localhost';
@@ -35,7 +47,7 @@ class SocketRequestTest extends \tests\BaseTest {
         $header = "GET /echo HTTP/1.1\r\n";
         $header.= "Upgrade: WebSocket\r\n";
         $header.= "Connection: Upgrade\r\n";
-        $header.= "Host: ".$host.":".$port."/clients/newtoken\r\n";
+        $header.= "Host: ".$host.":".$port."/tokens/newtoken\r\n";
         $header.= "Origin: http://foobar.com\r\n";
         $header.= "ServerAuthToken: 12345\r\n";
         $header.= 'Sec-WebSocket-Key: ' . $key1 . "\r\n";

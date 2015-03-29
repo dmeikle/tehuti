@@ -11,7 +11,7 @@
 
 namespace Gossamer\Tehuti\Utils;
 
-use exceptions\ObjectNotFoundException;
+use Gossamer\Tehuti\Exceptions\ObjectNotFoundException;
 
 /**
  * a container for all items to be passed throughout the sytem for dependency

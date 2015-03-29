@@ -8,83 +8,74 @@
  *  For the full copyright and license information, please view the LICENSE
  *  file that was distributed with this source code.
  */
+
 namespace Gossamer\Tehuti\Routing;
 
 use Gossamer\Tehuti\Utils\YAMLParser;
 use Gossamer\Tehuti\Core\SocketRequest;
 use Gossamer\Tehuti\Servers\ServerEvents;
+use Gossamer\Horus\EventListeners\Event;
+use Gossamer\Tehuti\Exceptions\ConfigNodeNotFoundException;
 
 /**
- * Router
+ * ServiceRouter
  *
  * @author Dave Meikle
  */
-class Router {
+class ServiceRouter extends Router{
     
-    use \Gossamer\Tehuti\Utils\ContainerTrait;
-    
-    protected $routingConfig = null;
-    
-    protected $parser = null;
+    private $config = null;
     
     public function __construct(YAMLParser $parser) {
-        $this->parser = $parser;
+        echo "new servicerouter\r\n";
+        //first init the parent parameters
+        parent::__construct($parser);
+        //load all configurations in 1 shot since we want to keep the
+        //config loaded to avoid file system access on a busy system
+        $this->initComponentConfigurations($parser);
+    }
+    
+    private function initComponentConfigurations(YAMLParser $parser) {
+
+        foreach($this->routingConfig as $component => $filePath) {           
+            $this->parser->setFilePath(__SITE_PATH . '/' . current($filePath));
+            $config = $this->parser->loadConfig();
+            
+            $this->config[$component] = $config;
+        }
         
-        $parser->setFilePath(__CONFIG_DIRECTORY . '/routing.yml');
-        
-        $this->routingConfig = $parser->loadConfig();
     }
     
     public function handleRequest(SocketRequest $request) {
        
         if(is_null($request->getComponent()) || strlen($request->getComponent()) == 0) {
-           
             //no rest style URI found
             return null;
         }
         try{
-            $config = ($this->loadComponentConfig($this->routingConfig[$request->getComponent()], $request->getUri()));
+            $config = $this->config[$request->getComponent()];
         }catch(\Exception $e) {
             
             return null;
         }
-        
+    
         //add any event listeners that are required for this component
         $this->container->get('EventDispatcher')->configListeners($config);
         $this->container->get('EventDispatcher')->dispatch('server', ServerEvents::COMPONENT_INITIATE, new Event(ServerEvents::COMPONENT_INITIATE, array('request' => $request)));
-       
-        $componentName = $config['defaults']['component'];
+        if(!array_key_exists($request->getComponent(), $this->config)) {
+            throw new ConfigNodeNotFoundException();
+        }
+        $nodeConfig = $this->findNodeByUri($config, $request->getUri());
+        
+        $componentName = $nodeConfig['defaults']['component'];
         $component = new $componentName($request, $this->container->get('Logger'));
         $component->setContainer($this->container);
         
         $this->container->get('EventDispatcher')->dispatch('server', ServerEvents::COMPONENT_REQUEST_START, new Event(ServerEvents::COMPONENT_REQUEST_START, array('request' => $request)));
        
-        $result = $component->handleRequest($config);
+        $result = $component->handleRequest($nodeConfig);
         $this->container->get('EventDispatcher')->dispatch('server', ServerEvents::COMPONENT_REQUEST_COMPLETE, new Event(ServerEvents::COMPONENT_REQUEST_COMPLETE, array('request' => $request)));
-       
-    }
-    
-    protected function loadComponentConfig(array $component, $uri) {
       
-        $this->parser->setFilePath(__SITE_PATH . '/' . current($component));
-        $config = $this->parser->loadConfig();
-        
-        return $this->findNodeByUri($config, $uri);
-    }   
-    
-    protected function findNodeByUri(array $config, $uri) {
-        $uriComparator = new URIComparator();
-       
-        return $config[$uriComparator->findPattern($config, $uri)];        
-    }
-    
-
-
-    protected function getContext(SocketRequest $request) {
-        if(!is_null($request->getAttribute('ServerAuthToken'))) {
-            return new ServerContext($request);
-        } else {
-            return new ClientContext($request);
-        }
+        return $result;
     }
 }

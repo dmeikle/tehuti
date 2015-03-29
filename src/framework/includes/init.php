@@ -7,6 +7,7 @@
       // register classes with namespaces
       $loader->add('components', __SITE_PATH .'/src');
       $loader->add('Gossamer\\Tehuti', __SITE_PATH . '/src/framework');
+      $loader->add('framework', __SITE_PATH . '/src');
  
       // activate the autoloader
       $loader->register();

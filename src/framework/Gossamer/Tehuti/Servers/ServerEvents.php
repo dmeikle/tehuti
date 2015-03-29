@@ -18,6 +18,13 @@ namespace Gossamer\Tehuti\Servers;
  */
 class ServerEvents {
     
+    /* component events */
+    const COMPONENT_INITIATE = 'component_initiate';
+    
+    const COMPONENT_REQUEST_START = 'component_request_start';
+    
+    const COMPONENT_REQUEST_COMPLETE = 'component_request_complete';
+    
     /* server events */
     const SERVER_STARTUP = 'server_startup';
     
@@ -27,6 +34,7 @@ class ServerEvents {
     
     const CLIENT_SERVER_REQUEST = 'client_server_request';
     
+    const NEW_CONNECTION = 'new_connection';
     
     /* client events */
     const CLIENT_CONNECT = 'client_connect';

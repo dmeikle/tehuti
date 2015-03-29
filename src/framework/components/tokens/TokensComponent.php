@@ -8,25 +8,16 @@
  *  For the full copyright and license information, please view the LICENSE
  *  file that was distributed with this source code.
  */
+namespace framework\components\tokens;
 
-namespace Gossamer\Tehuti\Routing;
+use Gossamer\Tehuti\Core\AbstractComponent;
 
 /**
- * Context
+ * StaffComponent
  *
  * @author Dave Meikle
  */
-class Context {
+class TokensComponent extends AbstractComponent {
     
-    protected $request;
     
-    public function __construct(Request $request) {
-        $this->request = $request;
-        
-       // print_r($request);
-    }
-    
-    public function getRequestUri() {
-        
-    }
 }

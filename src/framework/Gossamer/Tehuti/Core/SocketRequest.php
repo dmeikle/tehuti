@@ -23,11 +23,35 @@ class SocketRequest extends Request {
     
     protected $uri;
     
+    protected $component = null;
+
+    protected $ymlKey;
+    
+
     public function __construct($header) {
+        
         $this->parseHeader($header);
         $this->parseUri();
+        $this->setComponent($this->getComponentName());
+        
     }
     
+    public function getComponent() {
+        return $this->component;
+    }
+
+    public function getYmlKey() {
+        return $this->ymlKey;
+    }
+
+    public function setComponent($component) {
+        $this->component = $component;
+    }
+
+    public function setYmlKey($ymlKey) {
+        $this->ymlKey = $ymlKey;
+    }
+
     protected function parseUri() {
         $host = $this->headers['Host'];
         
@@ -40,6 +64,13 @@ class SocketRequest extends Request {
     
     public function getUri() {
         return $this->uri;
+    }
+    
+    private function getComponentName() {
+         
+        $pieces = explode('/', $this->getUri());
+        
+        return array_shift($pieces);
     }
     
     protected function parseHeader($receivedHeader) {
@@ -55,5 +86,13 @@ class SocketRequest extends Request {
                 $this->headers[$matches[1]] = $matches[2];
             }
         }
+    }
+    
+    public function getHeader($key) {
+        if(array_key_exists($key, $this->headers)) {
+            return $this->headers[$key];
+        }
+        
+        return null; 
     }
 }

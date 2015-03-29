@@ -9,24 +9,18 @@
  *  file that was distributed with this source code.
  */
 
-namespace Gossamer\Tehuti\Routing;
+namespace Gossamer\Tehuti\EventListeners;
+
+use Gossamer\Horus\EventListeners\Event;
 
 /**
- * Context
+ * AuthorizationListener
  *
  * @author Dave Meikle
  */
-class Context {
-    
-    protected $request;
-    
-    public function __construct(Request $request) {
-        $this->request = $request;
-        
-       // print_r($request);
-    }
-    
-    public function getRequestUri() {
-        
+class CheckServerCredentialsListener {
+   
+    public function on_client_server_connect(Event $event) {
+        echo "on client_server_connect\r\n";
     }
 }

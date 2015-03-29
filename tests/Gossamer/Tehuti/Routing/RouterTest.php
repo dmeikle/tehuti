@@ -13,6 +13,9 @@ namespace Gossamer\Tehuti\Routing;
 use Gossamer\Tehuti\Routing\Router;
 use Gossamer\Tehuti\Core\SocketRequest;
 use Gossamer\Tehuti\Utils\YAMLParser;
+use Gossamer\Tehuti\Utils\Container;
+use Gossamer\Horus\EventListeners\EventDispatcher;
+use Gossamer\Horus\Core\Request;
 
 /**
  * RouterTest
@@ -23,10 +26,15 @@ class RouterTest extends \tests\BaseTest {
  
     public function testGetHandler() {
         $router = new Router(new YAMLParser());
+        $container = new Container($this->getLogger());
+        $container->set('EventDispatcher', null, new EventDispatcher(array(), $this->getLogger(), new Request($this->getHeader())));
+        $container->set('Logger', null, $this->getLogger());
+        $router->setContainer($container);
+        echo $router->handleRequest(new SocketRequest($this->getHeader()));
         
-        $router->getHandler(new SocketRequest($this->getHeader()));
     }
 
+  
     
     private function getHeader() {
         $host = 'localhost';
@@ -38,7 +46,7 @@ class RouterTest extends \tests\BaseTest {
         $header = "GET /echo HTTP/1.1\r\n";
         $header.= "Upgrade: WebSocket\r\n";
         $header.= "Connection: Upgrade\r\n";
-        $header.= "Host: ".$host.":".$port."/clients/newtoken\r\n";
+        $header.= "Host: ".$host.":".$port."/staff/newtoken\r\n";
         $header.= "Origin: http://foobar.com\r\n";
         $header.= "ServerAuthToken: 12345\r\n";
         $header.= 'Sec-WebSocket-Key: ' . $key1 . "\r\n";

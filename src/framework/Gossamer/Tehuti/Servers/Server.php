@@ -13,8 +13,8 @@ namespace Gossamer\Tehuti\Servers;
 
 use Gossamer\Horus\EventListeners\EventDispatcher;
 use Gossamer\Tehuti\Core\SocketRequest;
-use Gossamer\Tehuti\Routing\Router;
 use Gossamer\Horus\EventListeners\Event;
+use Gossamer\Tehuti\Routing\ServiceRouter;
 
 /**
  * Server
@@ -43,8 +43,8 @@ class Server {
     }
 
     public function execute() {
-        $this->container->set('Router', 'Gossamer\\Tehuti\\Routing\\Router');
-        
+        $this->container->set('Router', null, new ServiceRouter($this->container->get('YamlParser')));
+        $this->container->get('Router')->setContainer($this->container);
        // $this->tokenManager = new TokenManager();
        
         //Create TCP/IP sream socket
@@ -68,7 +68,7 @@ class Server {
             $changed = $this->clients;
             try{
                 $this->checkNewSockets($socket, $changed);
-              //  $this->listenForMessages($changed);
+                $this->listenForMessages($changed);
             }catch(\Exception $e) {
                 
                 echo " error occurred: " . $e->getMessage();
@@ -78,6 +78,86 @@ class Server {
         socket_close($sock);
     }
     
+    private function listenForMessages(array $list) {
+        //loop through all connected sockets
+        foreach ($list as $changed_socket) {	
+            //check for any incomming data
+            while(socket_recv($changed_socket, $buf, 1024, 0) >= 1)
+            {
+                echo "\r\n$buf\r\n";
+                $received_text = $this->unmask($buf); //unmask data
+                echo "received:\r\n$received_text\r\n";
+                $tst_msg = json_decode($received_text); //json decode 
+                print_r($tst_msg);
+                $user_name = $tst_msg->name; //sender name
+                $user_message = $tst_msg->message; //message text
+                $user_color = $tst_msg->color; //color
+                //prepare data to be sent to client
+                $response_text = $this->mask(json_encode(array('type'=>'usermsg', 'name'=>$user_name, 'message'=>$user_message, 'color'=>$user_color)));
+                $this->sendMessage($response_text); //send data
+                break 2; //exit this loop
+            }
+            $buf = @socket_read($changed_socket, 1024, PHP_NORMAL_READ);
+            if ($buf === false) { // check disconnected client
+                // remove client for $clients array
+                $found_socket = array_search($changed_socket, $this->clients);
+                socket_getpeername($changed_socket, $ip);
+                unset($this->clients[$found_socket]);
+                //notify all users about disconnected connection
+                $response = $this->mask(json_encode(array('type'=>'system', 'message'=>$ip.' disconnected')));
+                $this->sendMessage($response);
+            }
+        }
+    }
+    
+    
+    private function sendMessage($msg)
+    {
+            foreach($this->clients as $changed_socket)
+            {
+                    @socket_write($changed_socket,$msg,strlen($msg));
+            }
+            return true;
+    }
+    
+    
+    //Unmask incoming framed message
+    private function unmask($text) {
+       echo "\r\n>>$text<<\r\n";
+	$length = ord($text[1]) & 127;
+	if($length == 126) {
+		$masks = substr($text, 4, 4);
+		$data = substr($text, 8);
+	}
+	elseif($length == 127) {
+		$masks = substr($text, 10, 4);
+		$data = substr($text, 14);
+	}
+	else {
+		$masks = substr($text, 2, 4);
+		$data = substr($text, 6);
+	}
+	$text = "";
+	for ($i = 0; $i < strlen($data); ++$i) {
+		$text .= $data[$i] ^ $masks[$i%4];
+	}
+	return $text;
+    }
+    //Encode message for transfer to client.
+    private function mask($text)
+    {
+	$b1 = 0x80 | (0x1 & 0x0f);
+	$length = strlen($text);
+	
+	if($length <= 125)
+		$header = pack('CC', $b1, $length);
+	elseif($length > 125 && $length < 65536)
+		$header = pack('CCn', $b1, 126, $length);
+	elseif($length >= 65536)
+		$header = pack('CCNN', $b1, 127, $length);
+	return $header.$text;
+    }
+
     
     private function checkNewSockets($socket, array &$list) {
         $null = NULL;
@@ -90,45 +170,53 @@ class Server {
             $socket_new = socket_accept($socket); //accept new socket
             
             $header = socket_read($socket_new, 1024); //read data sent by the socket
+            $this->performHandshaking($header, $socket_new, $this->host, $this->port); //perform websocket handshake
            
             socket_getpeername($socket_new, $ip); //get ip address of connected socket
             socket_set_option($socket_new, SOL_SOCKET, SO_KEEPALIVE, 1);
             
             $request = new SocketRequest($header);
-            $handler = $this->container->get('Router')->getHandler($request);
-            print_r($handler);
-            
-            $token = $this->checkIsServerConnect($header);
-            $response = null;
-
-            if($token !== false) {
-                $event = new Event(Events::CLIENT_SERVER_CONNECT, 
-                        array(
-                            'token' => $token, 
-                            'ipAddress' => $ip, 
-                            'header' => $header, 
-                            'tokenManager' => $this->tokenManager,
-                            'concierge' => $this->concierge
-                        ));
-                //throws an error if token invalid
-                $this->eventDispatcher->dispatch('server', Events::CLIENT_SERVER_CONNECT, $event);
-                $this->eventDispatcher->dispatch('server', Events::CLIENT_SERVER_REQUEST, $event);
-               
-               //a new token has been generated in one of the handlers
-               $response = $event->getParam(Actions::ACTION_RESPONSE);
-            } else {                
-                $event = new Event(Events::CLIENT_CONNECT, array('ipAddress' => $ip, 'header' => $header, 'tokenManager' => $this->tokenManager));
-                $this->eventDispatcher->dispatch('client', Events::CLIENT_CONNECT, $event);
-                $response = $this->mask(json_encode(array('type'=>'system', 'message'=>$ip.' connected'))); //prepare json data
-                $this->sendMessage($response); //notify all users about new connection
-                $this->concierge->addSocket($event->getParam('ClientToken'), $socket_new, $this->getClientId($header));
+            $event = new Event(ServerEvents::NEW_CONNECTION, array('ipAddress' => $ip, 'request' => $request));
+            $this->container->get('EventDispatcher')->dispatch('all', ServerEvents::NEW_CONNECTION, $event);
+                         
+            if(($event->getParam('request')->getAttribute('isServer'))) {
+                $result = $this->container->get('Router')->handleRequest($request);                
+                if(!is_null($result)) {
+                    @socket_write($socket_new,$result,strlen($result));
+                }
+            }else{
+                //TODO: add token auth check here
+                $this->clients[] = $socket_new; //add socket to client array
             }
-            $this->performHandshaking($header, $socket_new, $this->host, $this->port, $response); //perform websocket handshake
-            $this->clients[] = $socket_new; //add socket to client array
-
+           
             //make room for new socket
             $found_socket = array_search($socket, $list);
             unset($list[$found_socket]);
         }
+    }
+    
+    //handshake new client.
+    private function performHandshaking($receved_header,$client_conn, $host, $port)
+    {
+	$headers = array();
+	$lines = preg_split("/\r\n/", $receved_header);
+	foreach($lines as $line)
+	{
+		$line = chop($line);
+		if(preg_match('/\A(\S+): (.*)\z/', $line, $matches))
+		{
+			$headers[$matches[1]] = $matches[2];
+		}
+	}
+	$secKey = $headers['Sec-WebSocket-Key'];
+	$secAccept = base64_encode(pack('H*', sha1($secKey . '258EAFA5-E914-47DA-95CA-C5AB0DC85B11')));
+	//hand shaking header
+	$upgrade  = "HTTP/1.1 101 Web Socket Protocol Handshake\r\n" .
+	"Upgrade: websocket\r\n" .
+	"Connection: Upgrade\r\n" .
+	"WebSocket-Origin: $host\r\n" .
+	"WebSocket-Location: ws://$host:$port/demo/shout.php\r\n".
+	"Sec-WebSocket-Accept:$secAccept\r\n\r\n";
+	socket_write($client_conn,$upgrade,strlen($upgrade));
     }
 }

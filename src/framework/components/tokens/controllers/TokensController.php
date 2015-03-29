@@ -8,25 +8,18 @@
  *  For the full copyright and license information, please view the LICENSE
  *  file that was distributed with this source code.
  */
+namespace framework\components\tokens\controllers;
 
-namespace Gossamer\Tehuti\Routing;
-
+use Gossamer\Tehuti\Core\AbstractController;
 /**
- * Context
+ * StaffController
  *
  * @author Dave Meikle
  */
-class Context {
-    
-    protected $request;
-    
-    public function __construct(Request $request) {
-        $this->request = $request;
+class TokensController extends AbstractController{
+   
+    public function getNewToken() {
         
-       // print_r($request);
-    }
-    
-    public function getRequestUri() {
-        
+        return "NewToken: " . $this->model->getNewToken();
     }
 }

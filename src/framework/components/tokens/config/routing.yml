@@ -1,0 +1,13 @@
+
+
+tokens_newtoken:
+    pattern: tokens/newtoken
+    listeners:
+        - { 'event': 'component_request_start', 'listener': 'core\eventlisteners\LoadListListener', 'datasource': 'datasource1', 'class': 'components\geography\models\ProvinceModel', 'cacheKey': 'Provinces' }
+    defaults:
+        component: framework\components\tokens\TokensComponent
+        controller: framework\components\tokens\controllers\TokensController
+        model: framework\components\tokens\models\TokenModel
+        method: getNewToken
+    
+ 

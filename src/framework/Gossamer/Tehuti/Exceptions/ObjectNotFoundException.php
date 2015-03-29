@@ -8,25 +8,13 @@
  *  For the full copyright and license information, please view the LICENSE
  *  file that was distributed with this source code.
  */
-
-namespace Gossamer\Tehuti\Routing;
+namespace Gossamer\Tehuti\Exceptions;
 
 /**
- * Context
+ * ObjectNotFoundException
  *
  * @author Dave Meikle
  */
-class Context {
+class ObjectNotFoundException extends \Exception{
     
-    protected $request;
-    
-    public function __construct(Request $request) {
-        $this->request = $request;
-        
-       // print_r($request);
-    }
-    
-    public function getRequestUri() {
-        
-    }
 }

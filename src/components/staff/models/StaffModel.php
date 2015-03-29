@@ -8,25 +8,17 @@
  *  For the full copyright and license information, please view the LICENSE
  *  file that was distributed with this source code.
  */
+namespace components\staff\models;
 
-namespace Gossamer\Tehuti\Routing;
-
+use Gossamer\Tehuti\Core\AbstractModel;
 /**
- * Context
+ * StaffModel
  *
  * @author Dave Meikle
  */
-class Context {
+class StaffModel extends AbstractModel {
     
-    protected $request;
-    
-    public function __construct(Request $request) {
-        $this->request = $request;
-        
-       // print_r($request);
-    }
-    
-    public function getRequestUri() {
-        
+    public function getNewToken() {
+        return \uniqid();
     }
 }

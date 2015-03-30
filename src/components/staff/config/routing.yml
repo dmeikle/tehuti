@@ -1,9 +1,9 @@
 
 
 staff_newtoken:
-    pattern: staff/newtoken
+    pattern: staff/request_new_token
     listeners:
-        - { 'event': 'component_request_start', 'listener': 'core\eventlisteners\LoadListListener', 'datasource': 'datasource1', 'class': 'components\geography\models\ProvinceModel', 'cacheKey': 'Provinces' }
+        - { 'event': 'component_request_start', 'listener': 'components\staff\listeners\StaffListener', 'datasource': 'mysql' }
     defaults:
         component: components\staff\StaffComponent
         controller: components\staff\controllers\StaffController

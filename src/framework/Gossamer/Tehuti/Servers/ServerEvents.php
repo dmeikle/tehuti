@@ -38,4 +38,6 @@ class ServerEvents {
     
     /* client events */
     const CLIENT_CONNECT = 'client_connect';
+    
+    const CLIENT_NEW_TOKEN_REQUEST = 'new_token_request';
 }

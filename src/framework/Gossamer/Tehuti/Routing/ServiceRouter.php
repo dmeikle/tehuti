@@ -58,7 +58,8 @@ class ServiceRouter extends Router{
             
             return null;
         }
-    
+    print_r($this->config);
+    echo $request->getComponent()."\r\n";
         //add any event listeners that are required for this component
         $this->container->get('EventDispatcher')->configListeners($config);
         $this->container->get('EventDispatcher')->dispatch('server', ServerEvents::COMPONENT_INITIATE, new Event(ServerEvents::COMPONENT_INITIATE, array('request' => $request)));

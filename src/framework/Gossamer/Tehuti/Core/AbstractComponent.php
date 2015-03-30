@@ -11,12 +11,12 @@
 
 namespace Gossamer\Tehuti\Core;
 
-use Gossamer\Horus\Core\Request;
+use Gossamer\Tehuti\Core\SocketRequest;
 use Monolog\Logger;
 
-use exceptions\ParameterNotPassedException;
+use Gossamer\Tehuti\Exceptions\ParameterNotPassedException;
 
-use exceptions\HandlerNotCallableException;
+use Gossamer\Tehuti\Exceptions\HandlerNotCallableException;
 use core\eventlisteners\Event;
 
 /**
@@ -55,7 +55,7 @@ abstract class AbstractComponent {
      * 
      * @throws ParameterNotPassedException
      */
-    public function __construct(Request $request, Logger $logger) {
+    public function __construct(SocketRequest $request, Logger $logger) {
         //$this->logger->addDebug("abstractComponent: command:$command  entity:$entity" );
         $this->request = $request;
 
@@ -90,7 +90,7 @@ abstract class AbstractComponent {
               
                 echo $static;
                 $this->container->get('EventDispatcher')->dispatch('all', system\KernelEvents::RENDER_BYPASS, new Event());
-                $this->container->get('EventDispatcher')->dispatch(__YML_KEY, system\KernelEvents::RENDER_BYPASS, new Event());
+                $this->container->get('EventDispatcher')->dispatch($this->request->getYmlKey(), system\KernelEvents::RENDER_BYPASS, new Event());
 
                 return;
             }

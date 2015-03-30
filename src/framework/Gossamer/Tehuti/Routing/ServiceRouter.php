@@ -47,7 +47,7 @@ class ServiceRouter extends Router{
     }
     
     public function handleRequest(SocketRequest $request) {
-       
+      
         if(is_null($request->getComponent()) || strlen($request->getComponent()) == 0) {
             //no rest style URI found
             return null;
@@ -65,7 +65,7 @@ class ServiceRouter extends Router{
         if(!array_key_exists($request->getComponent(), $this->config)) {
             throw new ConfigNodeNotFoundException();
         }
-        $nodeConfig = $this->findNodeByUri($config, $request->getUri());
+        $nodeConfig = $this->findNodeByUri($config, $request);
         
         $componentName = $nodeConfig['defaults']['component'];
         $component = new $componentName($request, $this->container->get('Logger'));

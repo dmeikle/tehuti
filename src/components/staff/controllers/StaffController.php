@@ -21,4 +21,9 @@ class StaffController extends AbstractController{
     public function getNewToken() {
         return "NewToken: " . $this->model->getNewToken();
     }
+    
+    public function notify() {
+       
+        return array ('Message' => $this->model->notify());
+    }
 }

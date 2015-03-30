@@ -15,9 +15,9 @@ namespace Gossamer\Tehuti\Exceptions;
  *
  * @author Dave Meikle
  */
-class ConfigNodeNotFoundException extends \Exception{
+class HandlerNotCallableException extends \Exception{
     
-    public function __construct($message = 'Configuration Node Not Found', $code = 4004, $previous = null) {
+    public function __construct($message = 'Handler Not Callable', $code = 4500, $previous = null) {
         parent::__construct($message, $code, $previous);
     }
 }

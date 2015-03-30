@@ -71,7 +71,7 @@ class Server {
                 $this->listenForMessages($changed);
             }catch(\Exception $e) {
                 
-                echo " error occurred: " . $e->getMessage();
+                echo ">> error occurred: " . $e->getMessage() . "\r\n";
             }                
         }
         // close the listening socket
@@ -94,6 +94,7 @@ class Server {
                 $user_color = $tst_msg->color; //color
                 //prepare data to be sent to client
                 $response_text = $this->mask(json_encode(array('type'=>'usermsg', 'name'=>$user_name, 'message'=>$user_message, 'color'=>$user_color)));
+                print_r($response_text);
                 $this->sendMessage($response_text); //send data
                 break 2; //exit this loop
             }

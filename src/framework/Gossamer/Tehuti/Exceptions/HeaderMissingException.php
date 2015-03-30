@@ -15,9 +15,9 @@ namespace Gossamer\Tehuti\Exceptions;
  *
  * @author Dave Meikle
  */
-class ConfigNodeNotFoundException extends \Exception{
+class HeaderMissingException extends \Exception{
     
-    public function __construct($message = 'Configuration Node Not Found', $code = 4004, $previous = null) {
+    public function __construct($message = 'Bad Request - Header missing', $code = 4400, $previous = null) {
         parent::__construct($message, $code, $previous);
     }
 }

@@ -11,6 +11,8 @@
 namespace components\staff\models;
 
 use Gossamer\Tehuti\Core\AbstractModel;
+use Gossamer\Tehuti\Exceptions\HeaderMissingException;
+
 /**
  * StaffModel
  *
@@ -20,5 +22,16 @@ class StaffModel extends AbstractModel {
     
     public function getNewToken() {
         return \uniqid();
+    }
+    
+    public function notify() {
+        $messageHeader = $this->request->getHeader('Message');
+        
+        if(is_null($messageHeader)) {
+            throw new HeaderMissingException();
+        }
+        
+        //convert it to an array
+        return json_decode($messageHeader, true);
     }
 }

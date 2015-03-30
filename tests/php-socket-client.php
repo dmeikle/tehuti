@@ -1,3 +1,4 @@
+
 <?php
 /**
  * Very basic websocket client.
@@ -25,38 +26,20 @@ class WebsocketClient
  
 	public function sendData($data)
 	{
-//            $data = $this->mask(json_encode(array (
-//                'serverAuthToken' => '123',
-//		'method' => 'request_new_token',
-//		'clientIp' => '192.168.2.120',
-//		'name' => 'Dave'
-//		)));
-		$data = (json_encode(array (
-                    'roomId' => '1',
-                    'message' => 'asdasd',
-                    'name' => 'dave',
-                    'color' => 'FF7000'
-                )));
+            $data = json_encode(array (
+                'serverAuthToken' => '123',
+		'method' => 'request_new_token',
+		'clientIp' => '192.168.2.120',
+		'name' => 'Dave'
+		));
 		// send actual data:
 		fwrite($this->_Socket, "\x00" . $data . "\xff" ) or die('Error:' . $errno . ':' . $errstr); 
-                echo $data."\r\n";
-		//$wsData = fread($this->_Socket, 2000);
-		//$retData = trim($wsData,"\x00\xff");        
-		//return $retData;
+               // echo $data."\r\n";
+		$wsData = fread($this->_Socket, 2000);
+		$retData = trim($wsData,"\x00\xff");        
+		return $retData;
 	}
-  private function mask($text)
-    {
-	$b1 = 0x80 | (0x1 & 0x0f);
-	$length = strlen($text);
-	
-	if($length <= 125)
-		$header = pack('CC', $b1, $length);
-	elseif($length > 125 && $length < 65536)
-		$header = pack('CCn', $b1, 126, $length);
-	elseif($length >= 65536)
-		$header = pack('CCNN', $b1, 127, $length);
-	return $header.$text;
-    }
+ 
 	private function _connect($host, $port)
 	{
 		$key1 = $this->_generateRandomString(32);
@@ -64,22 +47,27 @@ class WebsocketClient
 		$key3 = $this->_generateRandomString(8, false, true);		
  
 		$header = "GET /echo HTTP/1.1\r\n";
-		$header.= "Upgrade: WebSocket\r\n";
+		$header.= "Host: ".$host.":".$port."/staff/notify\r\n";
+                $header.= "Message: {\"message\":\"Job 1234 has changed to Scoping Phase\",\"priority\":\"3\",\"room\":\"4\"}\r\n";
 		$header.= "Connection: Upgrade\r\n";
-		$header.= "Host: ".$host.":".$port."/staff/newtoken\r\n";
-		$header.= "Origin: http://foobar.com\r\n";
+                $header.= "Pragma: no-cache\r\n";
+                $header.= "Cache-Control: nocache\r\n";
+		$header.= "Upgrade: WebSocket\r\n";
+		$header.= "Origin: http://192.168.1.24\r\n";
+                $header.= "Sec-WebSocket-Version: 13\r\n";
 		$header.= "ServerAuthToken: 12345\r\n";
+                $header.= "User-Agent: CommandLine\r\n";
                 $header.= 'Sec-WebSocket-Key: ' . $key1 . "\r\n";
-		$header.= "Sec-WebSocket-Key1: " . $key1 . "\r\n";
-		$header.= "Sec-WebSocket-Key2: " . $key2 . "\r\n";
+//		$header.= "Sec-WebSocket-Key1: " . $key1 . "\r\n";
+//		$header.= "Sec-WebSocket-Key2: " . $key2 . "\r\n";
 		$header.= "\r\n";
-		$header.= $key3;
  
+
  
 		$this->_Socket = fsockopen($host, $port, $errno, $errstr, 2); 
 		fwrite($this->_Socket, $header) or die('Error: ' . $errno . ':' . $errstr); 
 		$response = fread($this->_Socket, 2000);
- 
+ echo $response;
 		/**
 		 * @todo: check response here. Currently not implemented cause "2 key handshake" is already deprecated.
 		 * See: http://en.wikipedia.org/wiki/WebSocket#WebSocket_Protocol_Handshake

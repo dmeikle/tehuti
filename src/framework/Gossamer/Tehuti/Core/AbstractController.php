@@ -15,11 +15,6 @@ use Gossamer\Tehuti\Core\AbstractModel;
 use Gossamer\Horus\Core\Request;
 use Monolog\Logger;
 
-use core\system\KernelEvents;
-
-use core\Entity;
-use core\system\Router;
-use core\eventlisteners\Event;
 
 /**
  * AbstractController Class 

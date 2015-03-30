@@ -20,3 +20,13 @@ staff_updatepreferences:
         controller: components\staff\controllers\StaffController
         model: components\staff\models\StaffModel
         method: updatePreferences    
+        
+staff_notify:  
+    pattern: staff/notify
+    listeners:
+       # - { 'event': 'request_start', 'listener': 'core\eventlisteners\LoadListListener', 'datasource': 'datasource1', 'class': 'components\geography\models\ProvinceModel', 'cacheKey': 'Provinces' }
+    defaults:
+        component: components\staff\StaffComponent
+        controller: components\staff\controllers\StaffController
+        model: components\staff\models\StaffModel
+        method: notify          

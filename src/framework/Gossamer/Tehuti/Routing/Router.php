@@ -72,10 +72,16 @@ class Router {
         return $this->findNodeByUri($config, $uri);
     }   
     
-    protected function findNodeByUri(array $config, $uri) {
+    protected function findNodeByUri(array $config, SocketRequest &$request) {
         $uriComparator = new URIComparator();
-       
-        return $config[$uriComparator->findPattern($config, $uri)];        
+        $offset = $uriComparator->findPattern($config, $request->getUri());
+        if(is_null($offset) || strlen($offset) == 0) {
+            throw new \Gossamer\Tehuti\Exceptions\ConfigNodeNotFoundException();
+        }
+        
+        $request->setYmlKey($uriComparator->findPattern($config, $request->getUri()));
+        
+        return $config[$request->getYmlKey()];        
     }
     
 

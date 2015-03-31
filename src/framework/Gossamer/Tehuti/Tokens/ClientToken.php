@@ -20,14 +20,95 @@ use Gossamer\Aker\Components\Security\Core\Client;
  */
 class ClientToken extends SecurityToken {
 
+    
+    protected $tokenString;
+    protected $tokenTimestamp;
+  
+
     /**
      * 
-     * @param Client $client
-     * @param string $ymlKey
-     * @param array $roles
+     * @param \Gossamer\Aker\Components\Security\Core\Client $client
      */
-    public function __construct(Client $client, array $roles = array()) {
-        parent::__construct($client, '', $roles);
+    public function __construct(Client $client) {
+        $this->setClient($client);
+        $this->tokenTimestamp = time();
+        
     }
+
     
+    /**
+     * accessor 
+     * 
+     * @param string
+     */
+    public function setIPAddress($ipAddress) {
+        $this->getClient()->setIpAddress($ipAddress);
+    }
+
+    /**
+     * accessor 
+     * 
+     * @param string
+     */
+    public function setTokenString($token) {
+        $this->tokenString = $token;
+    }
+
+    /**
+     * accessor 
+     * 
+     * @return string
+     */
+    public function getTimestamp() {
+        return $this->tokenTimestamp;
+    }
+
+    /**
+     * accessor 
+     * 
+     * @return string
+     */
+    public function toString() {
+        return $this->getClient()->getIpAddress() . '|' . $this->getClient()->getCredentials() . '|' . $this->getClient()->getId();
+    }
+
+    /**
+     * accessor 
+     * 
+     * @param string
+     */
+    public function setCredentials($credentials) {
+        $this->credentials = $credentials;
+    }
+
+    /**
+     * accessor 
+     * 
+     * @param int
+     */
+    public function setClientId($id) {
+        $this->clientId = $id;
+    }
+
+    /**
+     * accessor 
+     * 
+     * @return encrypted string
+     */
+    public function generateTokenString() {
+        $this->tokenString = crypt($this->toString());
+
+        return $this->tokenString;
+    }
+
+    /**
+     * accessor 
+     * 
+     * @return string
+     */
+    public function getTokenString() {
+        return $this->tokenString;
+    }
+
+
 }

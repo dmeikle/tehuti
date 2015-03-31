@@ -23,7 +23,8 @@ require_once(__SITE_PATH . '/vendor/composer/ClassLoader.php');
       $loader->add('Gossamer\\Horus', __SITE_PATH .'/vendor/gossamer/horus/src');
       $loader->add('Gossamer\\Pesedget', __SITE_PATH .'/vendor/gossamer/pesedget/src');
       $loader->add('Gossamer\\Caching', __SITE_PATH .'/vendor/gossamer/caching/src');
-
+      $loader->add('Gossamer\\Aker', __SITE_PATH .'/vendor/gossamer/aker/src');
+    
       $loader->add('Monolog', __SITE_PATH.'/vendor/monolog/monolog/src');
 
       // activate the autoloader

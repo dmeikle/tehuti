@@ -9,18 +9,16 @@
  *  file that was distributed with this source code.
  */
 
-namespace Gossamer\Tehuti\Clients;
+namespace Gossamer\Tehuti\Exceptions;
 
-use Gossamer\Aker\Components\Security\Core\Client as BaseClient;
 /**
- * Client
+ * InvalidSecurityTokenException
  *
  * @author Dave Meikle
  */
-class Client extends BaseClient {
-
-    public function setId($id) {
-        $this->id = $id;
+class TokenExpiredException extends \Exception{
+    
+    public function __construct($message = 'Token expired on client request', $code = 4501, $previous = null) {
+        parent::__construct($message, $code, $previous);
     }
-
 }

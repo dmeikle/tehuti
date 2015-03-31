@@ -27,13 +27,40 @@ class SocketRequest extends Request {
 
     protected $ymlKey;
     
+    protected $token;
 
     public function __construct($header) {
-        
+       
         $this->parseHeader($header);
+       
         $this->parseUri();
+        $this->getParameters($header);
         $this->setComponent($this->getComponentName());
         
+    }
+    
+    public function getToken() {
+        return $this->token;
+    }
+
+    public function setToken($token) {
+        $this->token = $token;
+        return $this;
+    }
+
+        
+    private function getParameters($header) {
+       
+        $lines = preg_split("/\r\n/", $header);
+        $get = urldecode(array_shift($lines));
+        $pieces = explode(' ', $get);
+print_r($pieces);
+        if(count($pieces) == 3) {
+            $chunks = explode('?', $pieces[1]);
+
+            $this->token = array_pop($chunks);
+            $this->uri = implode('/', $chunks);
+        }
     }
     
     public function getComponent() {
@@ -53,9 +80,9 @@ class SocketRequest extends Request {
     }
 
     protected function parseUri() {
-        $host = $this->headers['Host'];
+        $origin = $this->headers['Origin'];
         
-        $pieces = explode('/', $host);
+        $pieces = explode('/', $origin);
         //knock the URL and port off
         array_shift($pieces);
         
@@ -67,9 +94,11 @@ class SocketRequest extends Request {
     }
     
     private function getComponentName() {
-         
-        $pieces = explode('/', $this->getUri());
         
+        $pieces = explode('/', $this->getUri());
+        if(count($pieces) > 0 && strlen($pieces[0]) == 0) {
+            array_shift($pieces);
+        }
         return array_shift($pieces);
     }
     
@@ -77,7 +106,7 @@ class SocketRequest extends Request {
         $this->headers = array();
        
         $lines = preg_split("/\r\n/", $receivedHeader);
-        
+    
         foreach($lines as $line)
         {
             $line = chop($line);

@@ -15,7 +15,8 @@ use Gossamer\Horus\EventListeners\EventDispatcher;
 use Gossamer\Tehuti\Core\SocketRequest;
 use Gossamer\Horus\EventListeners\Event;
 use Gossamer\Tehuti\Routing\ServiceRouter;
-
+use Gossamer\Tehuti\Clients\ClientFactory;
+use Gossamer\Tehuti\Tokens\TokenFactory;
 /**
  * Server
  *
@@ -33,9 +34,12 @@ class Server {
     
     private $clients;
     
+    private $clientFactory;
+    
     public function __construct($host, $port) {
         $this->host = $host;
         $this->port = $port;
+        $this->clientFactory = new ClientFactory();
     }
     
     public function setEventDispatcher(EventDispatcher $eventDispatcher) {
@@ -45,8 +49,9 @@ class Server {
     public function execute() {
         $this->container->set('Router', null, new ServiceRouter($this->container->get('YamlParser')));
         $this->container->get('Router')->setContainer($this->container);
-       // $this->tokenManager = new TokenManager();
-       
+        $this->container->set('TokenFactory', null, new TokenFactory());
+        $this->container->get('TokenFactory')->setEventDispatcher($this->container->get('EventDispatcher'));
+        
         //Create TCP/IP sream socket
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         //reuseable port
@@ -172,7 +177,7 @@ class Server {
             
             $header = socket_read($socket_new, 1024); //read data sent by the socket
             $this->performHandshaking($header, $socket_new, $this->host, $this->port); //perform websocket handshake
-           
+          // print_r($header);
             socket_getpeername($socket_new, $ip); //get ip address of connected socket
             socket_set_option($socket_new, SOL_SOCKET, SO_KEEPALIVE, 1);
             
@@ -181,12 +186,16 @@ class Server {
             $this->container->get('EventDispatcher')->dispatch('all', ServerEvents::NEW_CONNECTION, $event);
                          
             if(($event->getParam('request')->getAttribute('isServer'))) {
+                echo "server request received\r\n";
                 $result = $this->container->get('Router')->handleRequest($request);                
                 if(!is_null($result)) {
                     @socket_write($socket_new,$result,strlen($result));
                 }
             }else{
-                //TODO: add token auth check here
+                echo "new client\r\n";
+                $event = new Event(ServerEvents::CLIENT_CONNECT, array('ipAddress' => $ip, 'request' => $request));
+                $event->setParam('TokenFactory', $this->container->get('TokenFactory'));
+                $this->container->get('EventDispatcher')->dispatch('client', ServerEvents::CLIENT_CONNECT, $event);
                 $this->clients[] = $socket_new; //add socket to client array
             }
            

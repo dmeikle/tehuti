@@ -33,9 +33,9 @@ class TokenFactoryTest  extends \tests\BaseTest {
         //generate a dummy token inside the factory list
         $tokenFactory = new TokenFactory();        
         $token = $tokenFactory->requestToken($this->getClient());
-        echo "$token\r\n";
+        echo "\r\n$token\r\n";
         
-       $token = '$1$zwO5VV1u$.E/inQN1oUXIBe2aHFs5g/';
+       //$token = '$1$zwO5VV1u$.E/inQN1oUXIBe2aHFs5g/';
         $clientToken = new ClientToken($this->getClient());
         $clientToken->setTokenString($token);
         $tokenFactory->checkToken($clientToken);

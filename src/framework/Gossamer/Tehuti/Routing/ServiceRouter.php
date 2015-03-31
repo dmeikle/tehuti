@@ -46,26 +46,25 @@ class ServiceRouter extends Router{
         
     }
     
-    public function handleRequest(SocketRequest $request) {
+    public function handleRequest(SocketRequest &$request) {
       
         if(is_null($request->getComponent()) || strlen($request->getComponent()) == 0) {
+           echo "no component found\r\n";
             //no rest style URI found
             return null;
         }
         try{
+            //get the configuration for this component 
             $config = $this->config[$request->getComponent()];
         }catch(\Exception $e) {
             
             return null;
         }
-    print_r($this->config);
-    echo $request->getComponent()."\r\n";
+  
         //add any event listeners that are required for this component
         $this->container->get('EventDispatcher')->configListeners($config);
         $this->container->get('EventDispatcher')->dispatch('server', ServerEvents::COMPONENT_INITIATE, new Event(ServerEvents::COMPONENT_INITIATE, array('request' => $request)));
-        if(!array_key_exists($request->getComponent(), $this->config)) {
-            throw new ConfigNodeNotFoundException();
-        }
+        
         $nodeConfig = $this->findNodeByUri($config, $request);
         
         $componentName = $nodeConfig['defaults']['component'];

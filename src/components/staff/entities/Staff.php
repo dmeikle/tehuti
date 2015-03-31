@@ -24,4 +24,5 @@ class Staff extends AbstractEntity implements SQLInterface {
         parent::__construct();
         $this->tablename = 'Staff';
     }
+    
 }

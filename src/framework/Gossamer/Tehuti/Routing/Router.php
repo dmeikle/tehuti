@@ -75,6 +75,7 @@ class Router {
     protected function findNodeByUri(array $config, SocketRequest &$request) {
         $uriComparator = new URIComparator();
         $offset = $uriComparator->findPattern($config, $request->getUri());
+        
         if(is_null($offset) || strlen($offset) == 0) {
             throw new \Gossamer\Tehuti\Exceptions\ConfigNodeNotFoundException();
         }

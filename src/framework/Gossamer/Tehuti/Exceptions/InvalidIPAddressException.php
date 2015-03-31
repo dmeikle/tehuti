@@ -9,13 +9,16 @@
  *  file that was distributed with this source code.
  */
 
-namespace Gossamer\Tehuti\EventListeners;
+namespace Gossamer\Tehuti\Exceptions;
 
 /**
- * ClientTokenListener
+ * InvalidIPAddressException
  *
  * @author Dave Meikle
  */
-class ClientTokenListener {
+class InvalidIPAddressException extends \Exception {
     
+    public function __construct($message = 'Invalid IP Address specified', $code = 4505, $previous = null) {
+        parent::__construct($message, $code, $previous);
+    }
 }

@@ -1,7 +1,7 @@
 
 
 staff_newtoken:
-    pattern: staff/request_new_token
+    pattern: staff/newtoken
     listeners:
         - { 'event': 'component_request_start', 'listener': 'components\staff\listeners\StaffListener', 'datasource': 'mysql' }
     defaults:

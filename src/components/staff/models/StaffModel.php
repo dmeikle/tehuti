@@ -12,6 +12,8 @@ namespace components\staff\models;
 
 use Gossamer\Tehuti\Core\AbstractModel;
 use Gossamer\Tehuti\Exceptions\HeaderMissingException;
+use Gossamer\Tehuti\Exceptions\InvalidIPAddressException;
+use Gossamer\Tehuti\Clients\Client;
 
 /**
  * StaffModel
@@ -21,7 +23,10 @@ use Gossamer\Tehuti\Exceptions\HeaderMissingException;
 class StaffModel extends AbstractModel {
     
     public function getNewToken() {
-        return \uniqid();
+        $staffId = $this->request->getHeader('StaffId');
+        $ipAddress = $this->request->getHeader('StaffIp');
+        
+        return $this->container->get('TokenFactory')->requestToken($this->getClient($staffId, $ipAddress));
     }
     
     public function notify() {
@@ -34,4 +39,17 @@ class StaffModel extends AbstractModel {
         //convert it to an array
         return json_decode($messageHeader, true);
     }
+    
+    private function getClient($staffId, $ipAddress) {
+        if(filter_var($ipAddress, FILTER_VALIDATE_IP) === FALSE) {
+            throw new InvalidIPAddressException();
+        }
+        
+        $client = new Client();
+        $client->setId(intval($staffId));
+        $client->setIpAddress($ipAddress);
+        
+        return $client;
+    }
+    
 }

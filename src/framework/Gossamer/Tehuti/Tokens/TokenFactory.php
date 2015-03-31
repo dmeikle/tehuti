@@ -23,17 +23,45 @@ use Gossamer\Tehuti\Exceptions\TokenExpiredException;
  */
 class TokenFactory {
     
+    use \Gossamer\Horus\EventListeners\EventDispatcherTrait;
+    
     private $tokens;
     
     const MAX_DECAY_TIME = 300;
     
     public function checkToken(ClientToken $clientToken) {
-       if(!($this->checkTokenValid($clientToken, $this->tokens[$clientToken->getClient()->getId()]))) {
-           throw new InvalidSecurityTokenException();
-       }
-       if(!($this->checkTokenDecayTime($clientToken))) {
-           throw new TokenExpiredException();
-       }
+       //with websockets there's no real way (yet) to pass header information
+        //that would contain staffId - so for now we will just grab the matching
+        //token in our list since we cannot (yet) generate a new token with info
+        //other than their IP address unless we want to start exposing keys
+        //used within our hash (such as staffId) which is just as pointless        
+//       if(!($this->checkTokenValid($clientToken, $this->tokens[$clientToken->getClient()->getId()]))) {
+//           throw new InvalidSecurityTokenException();
+//       }
+        //so for now, we will assume no one on the same WAN ip address has stolen
+        //our token for their own listening  (websocket fail...). That makes 
+        //this factory an identity lookup and not a security check... :(
+        
+        $clientId = $this->findMatchingToken($clientToken);
+        if($clientId == 0) {
+            throw new InvalidSecurityTokenException();
+        }
+        if(!($this->checkTokenDecayTime($this->tokens[$clientId]))) {
+            throw new TokenExpiredException();
+        }
+        
+        return $this->tokens[$clientId];
+    }
+    
+    private function findMatchingToken(ClientToken $clientToken) {
+      
+        foreach ($this->tokens as $clientId => $token) {
+            if($token->getTokenString() == $clientToken->getTokenString()) {
+                return $clientId;
+            }
+        }
+        
+        return 0;
     }
     
     /**
@@ -42,13 +70,17 @@ class TokenFactory {
      * 
      * @param FormToken $token
      */
-    private function checkTokenDecayTime(FormToken $token) {
+    private function checkTokenDecayTime(ClientToken $token) {
+        
         $currentTime = time();
         $tokenTime = $token->getTimestamp();
         if(($currentTime - $tokenTime) > self::MAX_DECAY_TIME) {
             
             $this->eventDispatcher->dispatch('all', 'token_expired');
+            return false;
         }                
+        
+        return true;
     }
     
     /**
@@ -59,11 +91,15 @@ class TokenFactory {
      * @param FormToken $defaultToken
      */
     private function checkTokenValid(ClientToken $token, ClientToken $defaultToken) {
-       echo "check ".$token->getTokenString(). " against " . $defaultToken->getTokenString()."\r\n";
+    
         if(!crypt($token->getTokenString(), $defaultToken->toString() == $defaultToken->toString())) {
-          echo "******************\r\n".crypt($token->getTokenString(), $defaultToken->toString())."\r\n".$defaultToken->toString()."\r\n***************\r\n";
+            
             $this->eventDispatcher->dispatch('all', 'token_missing');
+            
+            return false;
         }
+        
+        return true;
     }
     
     public function requestToken(ClientInterface $client) {

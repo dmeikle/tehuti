@@ -19,11 +19,18 @@ use Gossamer\Tehuti\Core\AbstractController;
 class StaffController extends AbstractController{
    
     public function getNewToken() {
-        return "NewToken: " . $this->model->getNewToken();
+        echo "getnewtoken\r\n";
+        $token = $this->model->getNewToken();
+        print_r($this->container->get('TokenFactory'));
+        return "NewToken: " . $token;
     }
     
     public function notify() {
        
         return array ('Message' => $this->model->notify());
+    }
+    
+    public function addStaff() {
+        
     }
 }

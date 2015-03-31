@@ -46,13 +46,15 @@ class WebsocketClient
 		$key2 = $this->_generateRandomString(32);
 		$key3 = $this->_generateRandomString(8, false, true);		
  
-		$header = "GET /echo HTTP/1.1\r\n";
-		$header.= "Host: ".$host.":".$port."/staff/newtoken\r\n";
+		$header = "GET /staff/newtoken?12345 HTTP/1.1\r\n";
+		$header.= "Host: ".$host.":".$port."\r\n";
 		$header.= "Connection: Upgrade\r\n";
                 $header.= "Pragma: no-cache\r\n";
                 $header.= "Cache-Control: nocache\r\n";
 		$header.= "Upgrade: WebSocket\r\n";
-		$header.= "Origin: http://192.168.1.24\r\n";
+                $header.= "StaffIp: 192.168.2.251\r\n";
+                $header.= "StaffId: 1\r\n";
+		$header.= "Origin: http://192.168.2.252\r\n";
                 $header.= "Sec-WebSocket-Version: 13\r\n";
 		$header.= "ServerAuthToken: 12345\r\n";
                 $header.= "User-Agent: CommandLine\r\n";
@@ -105,7 +107,7 @@ class WebsocketClient
 	}
 }
  echo "new websocket\r\n";
-$WebSocketClient = new WebsocketClient('192.168.1.24', 9000);
+$WebSocketClient = new WebsocketClient('192.168.2.252', 9000);
 echo "sending data\r\n";
 echo $WebSocketClient->sendData('1337');
 echo "data sent\r\n";

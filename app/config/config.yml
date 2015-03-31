@@ -2,18 +2,18 @@
 ---
 all:
     listeners:
-        - { 'event': 'new_connection', 'listener': '\Gossamer\Tehuti\EventListeners\ConnectionListener' }
+        - { 'event': 'new_connection', 'listener': 'Gossamer\Tehuti\EventListeners\ConnectionListener' }
 server:
     host: 192.168.2.252
     port: 9000
     listeners:
-        - { 'event': 'server_initiate', 'listener': '\Gossamer\Sockets\EventListeners\ServerEventListener' }
-        - { 'event': 'server_startup', 'listener': '\Gossamer\Sockets\EventListeners\ServerEventListener' }
-        - { 'event': 'client_server_connect', 'listener': '\Gossamer\Tehuti\EventListeners\CheckServerCredentialsListener' }
-        - { 'event': 'client_server_request', 'listener': '\Gossamer\Sockets\EventListeners\GetServerRequestListener' }
+        - { 'event': 'server_initiate', 'listener': 'Gossamer\Sockets\EventListeners\ServerEventListener' }
+        - { 'event': 'server_startup', 'listener': 'Gossamer\Sockets\EventListeners\ServerEventListener' }
+        - { 'event': 'client_server_connect', 'listener': 'Gossamer\Tehuti\EventListeners\CheckServerCredentialsListener' }
+        - { 'event': 'client_server_request', 'listener': 'Gossamer\Sockets\EventListeners\GetServerRequestListener' }
 client:
     listeners:
-        - { 'event': 'client_connect', 'listener': '\Gossamer\Sockets\EventListeners\CheckClientCredentialsListener' }
+        - { 'event': 'client_connect', 'listener': 'Gossamer\Tehuti\EventListeners\CheckClientCredentialsListener' }
         
         
 #this is an afterthought. Originally the system was written with Monolog\Logger

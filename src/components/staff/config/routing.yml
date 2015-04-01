@@ -8,6 +8,7 @@ staff_newtoken:
         component: components\staff\StaffComponent
         controller: components\staff\controllers\StaffController
         model: components\staff\models\StaffModel
+        view: Gossamer\Tehuti\Core\ServerView
         method: getNewToken
     
     
@@ -19,6 +20,7 @@ staff_updatepreferences:
         component: components\staff\StaffComponent
         controller: components\staff\controllers\StaffController
         model: components\staff\models\StaffModel
+        view: Gossamer\Tehuti\Core\ClientView
         method: updatePreferences    
         
 staff_notify:  
@@ -29,4 +31,16 @@ staff_notify:
         component: components\staff\StaffComponent
         controller: components\staff\controllers\StaffController
         model: components\staff\models\StaffModel
+        view: Gossamer\Tehuti\Core\ClientView
         method: notify          
+        
+staff_connect: 
+    pattern: staff/connect
+    listeners:
+       - { 'event': 'component_request_start', 'listener': 'components\staff\listeners\CheckStaffCredentialsListener' }
+    defaults:
+        component: components\staff\StaffComponent
+        controller: components\staff\controllers\StaffController
+        model: components\staff\models\StaffModel
+        view: Gossamer\Tehuti\Core\ClientView
+        method: connect          

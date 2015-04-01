@@ -22,7 +22,7 @@ use Gossamer\Tehuti\Exceptions\ConfigNodeNotFoundException;
  *
  * @author Dave Meikle
  */
-class ServiceRouter extends Router{
+class ServiceRouter extends Router {
     
     private $config = null;
     
@@ -66,15 +66,15 @@ class ServiceRouter extends Router{
         $this->container->get('EventDispatcher')->dispatch('server', ServerEvents::COMPONENT_INITIATE, new Event(ServerEvents::COMPONENT_INITIATE, array('request' => $request)));
         
         $nodeConfig = $this->findNodeByUri($config, $request);
-        
+        $this->container->get('EventDispatcher')->configListeners(array($nodeConfig));
         $componentName = $nodeConfig['defaults']['component'];
         $component = new $componentName($request, $this->container->get('Logger'));
         $component->setContainer($this->container);
         
-        $this->container->get('EventDispatcher')->dispatch('server', ServerEvents::COMPONENT_REQUEST_START, new Event(ServerEvents::COMPONENT_REQUEST_START, array('request' => $request)));
+        $this->container->get('EventDispatcher')->dispatch($request->getYmlKey(), ServerEvents::COMPONENT_REQUEST_START, new Event(ServerEvents::COMPONENT_REQUEST_START, array('request' => $request)));
        
         $result = $component->handleRequest($nodeConfig);
-        $this->container->get('EventDispatcher')->dispatch('server', ServerEvents::COMPONENT_REQUEST_COMPLETE, new Event(ServerEvents::COMPONENT_REQUEST_COMPLETE, array('request' => $request)));
+        $this->container->get('EventDispatcher')->dispatch($request->getYmlKey(), ServerEvents::COMPONENT_REQUEST_COMPLETE, new Event(ServerEvents::COMPONENT_REQUEST_COMPLETE, array('request' => $request)));
       
         return $result;
     }

@@ -26,11 +26,13 @@ class WebsocketClient
  
 	public function sendData($data)
 	{
+            ini_set('display_errors', 1); 
+error_reporting(E_ALL);
             $data = json_encode(array (
-                'serverAuthToken' => '123',
-		'method' => 'request_new_token',
-		'clientIp' => '192.168.2.120',
-		'name' => 'Dave'
+                'type' => 'usermsg',
+		'name' => 'server2',
+		'message' => 'this is a test',
+		'color' => '#666666'
 		));
 		// send actual data:
 		fwrite($this->_Socket, "\x00" . $data . "\xff" ) or die('Error:' . $errno . ':' . $errstr); 
@@ -40,6 +42,17 @@ class WebsocketClient
 		return $retData;
 	}
  
+        private function getRequest() {
+            $request = new ClientRequest();
+            $request->setDate(strtolower("now"));
+            $request->setMessage("this is a new request object");
+            $request->setPriorityLevel(1);
+            $request->setSubject("testing the subject");
+            $request->setTypeId(2);
+            $request->setStaffId(array(2));
+            
+            return json_encode($request->toArray());
+        }
 	private function _connect($host, $port)
 	{
 		$key1 = $this->_generateRandomString(32);
@@ -48,7 +61,7 @@ class WebsocketClient
  
 		$header = "GET /staff/notify?12345 HTTP/1.1\r\n";
 		$header.= "Host: ".$host.":".$port."/staff/notify\r\n";
-                $header.= "Message: {\"message\":\"Job 1234 has changed to Scoping Phase\",\"priority\":\"3\",\"room\":\"4\"}\r\n";
+                $header.= "Message: " . $this->getRequest() . "\r\n";
 		$header.= "Connection: Upgrade\r\n";
                 $header.= "Pragma: no-cache\r\n";
                 $header.= "Cache-Control: nocache\r\n";
@@ -104,11 +117,107 @@ class WebsocketClient
 		$randomString = substr($randomString, 0, $length);
 		return $randomString;
 	}
+        
+        private function mask($text)
+        {
+            $b1 = 0x80 | (0x1 & 0x0f);
+            $length = strlen($text);
+
+            if($length <= 125)
+                    $header = pack('CC', $b1, $length);
+            elseif($length > 125 && $length < 65536)
+                    $header = pack('CCn', $b1, 126, $length);
+            elseif($length >= 65536)
+                    $header = pack('CCNN', $b1, 127, $length);
+            return $header.$text;
+        }
 }
  echo "new websocket\r\n";
 $WebSocketClient = new WebsocketClient('192.168.2.252', 9000);
+sleep(5);
 echo "sending data\r\n";
 echo $WebSocketClient->sendData('1337');
 echo "data sent\r\n";
 unset($WebSocketClient);
+
+class ClientRequest {
+    
+    private $typeId;
+    
+    private $subject;
+    
+    private $message;
+    
+    private $date;
+    
+    private $priorityLevel;
+    
+    private $staffId = array();
+    
+    public function getTypeId() {
+        return $this->typeId;
+    }
+
+    public function getSubject() {
+        return $this->subject;
+    }
+
+    public function getMessage() {
+        return $this->message;
+    }
+
+    public function getDate() {
+        return $this->date;
+    }
+
+    public function getPriorityLevel() {
+        return $this->priorityLevel;
+    }
+
+    public function getStaffId() {
+        return $this->staffId;
+    }
+
+    public function setTypeId($typeId) {
+        $this->typeId = $typeId;
+        return $this;
+    }
+
+    public function setSubject($subject) {
+        $this->subject = $subject;
+        return $this;
+    }
+
+    public function setMessage($message) {
+        $this->message = $message;
+        return $this;
+    }
+
+    public function setDate($date) {
+        $this->date = $date;
+        return $this;
+    }
+
+    public function setPriorityLevel($priorityLevel) {
+        $this->priorityLevel = $priorityLevel;
+        return $this;
+    }
+
+    public function setStaffId(array $staffId) {
+        $this->staffId = $staffId;
+        return $this;
+    }
+
+    public function toArray() {
+        return array(
+            'typeId' => $this->typeId, 
+            'subject' => $this->subject, 
+            'message' => $this->message, 
+            'date' => $this->date, 
+            'priorityLevel' => $this->priorityLevel, 
+            'staffId' => $this->staffId
+            );
+    }
+}
+
 ?>

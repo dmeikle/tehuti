@@ -21,13 +21,19 @@ class StaffController extends AbstractController{
     public function getNewToken() {
         echo "getnewtoken\r\n";
         $token = $this->model->getNewToken();
-        print_r($this->container->get('TokenFactory'));
-        return "NewToken: " . $token;
+        
+        return $this->view->render(array('message' => 'NewToken: ' . $token));
     }
     
     public function notify() {
-       echo "notify\r\n";
-        return array ('Message' => $this->model->notify());
+        echo "notify\r\n";
+        $message = $this->model->notify();
+        
+        return $this->view->render(array('message' => $message['message']));
+    }
+    
+    public function connect() {
+        
     }
     
     public function addStaff() {

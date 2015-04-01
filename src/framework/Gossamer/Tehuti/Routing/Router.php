@@ -35,7 +35,7 @@ class Router {
         $this->routingConfig = $parser->loadConfig();
     }
     
-    public function handleRequest(SocketRequest $request) {
+    public function handleRequest(SocketRequest &$request) {
        
         if(is_null($request->getComponent()) || strlen($request->getComponent()) == 0) {
            

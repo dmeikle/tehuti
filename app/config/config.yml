@@ -1,11 +1,13 @@
-## YAML Template.
----
+
+
+
 all:
     listeners:
         - { 'event': 'new_connection', 'listener': 'Gossamer\Tehuti\EventListeners\ConnectionListener' }
 server:
     host: 192.168.2.252
     port: 9000
+    preloadConfiguration: true
     listeners:
         - { 'event': 'server_initiate', 'listener': 'Gossamer\Sockets\EventListeners\ServerEventListener' }
         - { 'event': 'server_startup', 'listener': 'Gossamer\Sockets\EventListeners\ServerEventListener' }

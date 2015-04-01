@@ -17,7 +17,6 @@ use Monolog\Logger;
 
 
 use core\datasources\DataSourceInterface;
-use libraries\utils\Container;
 use libraries\utils\Pagination;
 use Gossamer\Caching\CacheManager;
 use core\components\mappings\models\MappingModel;
@@ -29,7 +28,7 @@ use libraries\utils\preferences\UserPreferences;
  * 
  * @author Dave Meikle
  */
-class AbstractModel {
+abstract class AbstractModel {
 
     use \Gossamer\Tehuti\Utils\ContainerTrait;
     
@@ -39,7 +38,6 @@ class AbstractModel {
     protected $navigation = null;
     protected $httpRequest = null;
     protected $httpResponse = null;
-    protected $container = null;
     protected $logger = null;
 
     /**

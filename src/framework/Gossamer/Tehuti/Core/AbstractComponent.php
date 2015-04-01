@@ -40,7 +40,6 @@ abstract class AbstractComponent {
     protected $method = null;
     protected $params = null;
     protected $logger = null;
-    protected $container = null;
     
 
     /**
@@ -75,6 +74,7 @@ abstract class AbstractComponent {
         $controllerName = $config['defaults']['controller'];
         $method = $config['defaults']['method'];
         $modelName = $config['defaults']['model'];
+        $viewName = $config['defaults']['view'];
         
         $handler = array(
             $controllerName,
@@ -85,6 +85,8 @@ abstract class AbstractComponent {
 
             //$commandName = $this->command;
             $model = new $modelName($this->request, $this->logger);
+            $view = new $viewName($this->request, $this->logger);
+            
             $static = $this->request->getAttribute($this->modelName . '_static');
             if (!is_null($static) && strlen($static) > 0) {
               
@@ -95,10 +97,10 @@ abstract class AbstractComponent {
                 return;
             }
             $model->setContainer($this->container);
-
+            
             //$model->setDatasource($this->getDatasource());
 
-            $controller = new $controllerName($model, $this->request, $this->logger);
+            $controller = new $controllerName($model, $view, $this->request, $this->logger);
 
             $controller->setContainer($this->container);
             try {

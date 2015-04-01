@@ -11,6 +11,9 @@
 
 namespace Gossamer\Tehuti\Servers;
 
+ini_set('display_errors', 1); 
+error_reporting(E_ALL);
+
 use Gossamer\Horus\EventListeners\EventDispatcher;
 use Gossamer\Tehuti\Core\SocketRequest;
 use Gossamer\Horus\EventListeners\Event;
@@ -40,6 +43,7 @@ class Server {
         $this->host = $host;
         $this->port = $port;
         $this->clientFactory = new ClientFactory();
+        $this->clients = array();
     }
     
     public function setEventDispatcher(EventDispatcher $eventDispatcher) {
@@ -93,13 +97,13 @@ class Server {
                 $received_text = $this->unmask($buf); //unmask data
                 echo "received:\r\n$received_text\r\n";
                 $tst_msg = json_decode($received_text); //json decode 
-                print_r($tst_msg);
+                
                 $user_name = $tst_msg->name; //sender name
                 $user_message = $tst_msg->message; //message text
                 $user_color = $tst_msg->color; //color
                 //prepare data to be sent to client
                 $response_text = $this->mask(json_encode(array('type'=>'usermsg', 'name'=>$user_name, 'message'=>$user_message, 'color'=>$user_color)));
-                print_r($response_text);
+               
                 $this->sendMessage($response_text); //send data
                 break 2; //exit this loop
             }
@@ -127,9 +131,11 @@ class Server {
         return true;
     }
     
+   
     
     //Unmask incoming framed message
     private function unmask($text) {
+       
        echo "\r\n>>$text<<\r\n";
 	$length = ord($text[1]) & 127;
 	if($length == 126) {
@@ -187,27 +193,37 @@ class Server {
             $this->container->get('EventDispatcher')->dispatch('all', ServerEvents::NEW_CONNECTION, $event);
                          
             if(($event->getParam('request')->getAttribute('isServer'))) {
-                echo "server request received\r\n";
-                $result = $this->container->get('Router')->handleRequest($request);                
-                if(!is_null($result)) {
-                    @socket_write($socket_new,$result,strlen($result));
+               
+                $response = $this->container->get('Router')->handleRequest($request);   
+               
+                if($response->getRespondToServer()) {
+                    if(!is_null($response->getMessage())) {
+                        $message = $this->mask(json_encode($response->getMessage()));
+                        @socket_write($socket_new, $message, strlen($message));
+                    }                    
+                } else {
+                    //ok - let's see if there's something to broadcast to our list
+                    $this->sendMessage($this->mask(json_encode($response->getMessage())));
                 }
-                print_r($result['Message']);
-                $response_text = $this->mask(json_encode(array('type'=>'usermsg', 'name'=>'server', 'message'=>$result['Message']['message'], 'color'=>'#000000')));
-                echo $result['Message']['message']."\r\n";
-                $this->sendMessage($response_text);
+                //$this->clients[] = $socket_new;                
             }else{
                 echo "new client\r\n";
+                $response = $this->container->get('Router')->handleRequest($request);   
                 $event = new Event(ServerEvents::CLIENT_CONNECT, array('ipAddress' => $ip, 'request' => $request));
                 $event->setParam('TokenFactory', $this->container->get('TokenFactory'));
                 $this->container->get('EventDispatcher')->dispatch('client', ServerEvents::CLIENT_CONNECT, $event);
+              
                 $this->clients[] = $socket_new; //add socket to client array
             }
            
             //make room for new socket
             $found_socket = array_search($socket, $list);
             unset($list[$found_socket]);
+            
+            print_r($this->clients);
         }
+        
+        
     }
     
     //handshake new client.

@@ -11,11 +11,17 @@
 
 namespace Gossamer\Tehuti\EventListeners;
 
+use Gossamer\Horus\EventListeners\AbstractListener;
+
 /**
  * ClientListener
  *
  * @author Dave Meikle
  */
-class ClientListener {
+class ClientListener extends AbstractListener {
     
+    public function on_new_token_request(Event $event) {
+        //first check to see if the token already exists for this client
+        $this->container
+    }
 }

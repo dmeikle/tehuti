@@ -22,7 +22,7 @@ use Monolog\Logger;
  * Author: Dave Meikle
  * Copyright: Quantum Unit Solutions 2013
  */
-class AbstractController {
+abstract class AbstractController {
 
     use \Gossamer\Tehuti\Utils\ContainerTrait;
     
@@ -40,6 +40,8 @@ class AbstractController {
     protected $request;
 
     
+    protected $view = null;
+    
     protected $logger = null;
 
     /**
@@ -49,12 +51,13 @@ class AbstractController {
      * @param Registry values to be built upon throughout the response
      * 
      */
-    public function __construct(AbstractModel $model, Request &$request, Logger $logger) {
+    public function __construct(AbstractModel $model, AbstractView $view, Request &$request, Logger $logger) {
 
         $this->controllerName = strtolower(get_class($this));
 
         $this->logger = $logger;
         $this->model = $model;
+        $this->view = $view;
         $this->request = $request;
     }
 

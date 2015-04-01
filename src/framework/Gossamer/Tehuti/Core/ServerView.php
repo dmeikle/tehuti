@@ -12,12 +12,22 @@
 namespace Gossamer\Tehuti\Core;
 
 /**
- * AbstractView
+ * ServerView
  *
  * @author Dave Meikle
  */
-abstract class AbstractView {
-    use \Gossamer\Tehuti\Utils\ContainerTrait;
+class ServerView extends AbstractView {
     
-    public abstract function render(array $message);
+    public function render(array $message) {
+        
+        $response = new Response();
+        
+        $response->setRespondToServer(true);
+        $response->setMessage(array('message' => $message['message']));
+        
+        return $response;
+        
+    }
+
+
 }

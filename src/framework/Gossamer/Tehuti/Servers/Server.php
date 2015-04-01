@@ -119,11 +119,12 @@ class Server {
     
     private function sendMessage($msg)
     {
-            foreach($this->clients as $changed_socket)
-            {
-                    @socket_write($changed_socket,$msg,strlen($msg));
-            }
-            return true;
+        foreach($this->clients as $changed_socket)
+        {
+            @socket_write($changed_socket,$msg,strlen($msg));
+        }
+        
+        return true;
     }
     
     
@@ -192,8 +193,9 @@ class Server {
                     @socket_write($socket_new,$result,strlen($result));
                 }
                 print_r($result['Message']);
+                $response_text = $this->mask(json_encode(array('type'=>'usermsg', 'name'=>'server', 'message'=>$result['Message']['message'], 'color'=>'#000000')));
                 echo $result['Message']['message']."\r\n";
-                socket_write($socket_new,$result['Message']['message'],strlen($result['Message']['message']));
+                $this->sendMessage($response_text);
             }else{
                 echo "new client\r\n";
                 $event = new Event(ServerEvents::CLIENT_CONNECT, array('ipAddress' => $ip, 'request' => $request));

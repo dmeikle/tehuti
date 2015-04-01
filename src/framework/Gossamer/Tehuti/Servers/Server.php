@@ -191,6 +191,9 @@ class Server {
                 if(!is_null($result)) {
                     @socket_write($socket_new,$result,strlen($result));
                 }
+                print_r($result['Message']);
+                echo $result['Message']['message']."\r\n";
+                socket_write($socket_new,$result['Message']['message'],strlen($result['Message']['message']));
             }else{
                 echo "new client\r\n";
                 $event = new Event(ServerEvents::CLIENT_CONNECT, array('ipAddress' => $ip, 'request' => $request));

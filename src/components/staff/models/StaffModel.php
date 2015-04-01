@@ -35,7 +35,7 @@ class StaffModel extends AbstractModel {
         if(is_null($messageHeader)) {
             throw new HeaderMissingException();
         }
-        
+         
         //convert it to an array
         return json_decode($messageHeader, true);
     }

@@ -60,6 +60,8 @@ print_r($pieces);
 
             $this->token = array_pop($chunks);
             $this->uri = implode('/', $chunks);
+            
+            echo "token: ".$this->token."\r\nuri: ".$this->uri."\r\n";
         }
     }
     

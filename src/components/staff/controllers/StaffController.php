@@ -26,7 +26,7 @@ class StaffController extends AbstractController{
     }
     
     public function notify() {
-       
+       echo "notify\r\n";
         return array ('Message' => $this->model->notify());
     }
     

@@ -46,7 +46,7 @@ class WebsocketClient
 		$key2 = $this->_generateRandomString(32);
 		$key3 = $this->_generateRandomString(8, false, true);		
  
-		$header = "GET /echo HTTP/1.1\r\n";
+		$header = "GET /staff/notify?12345 HTTP/1.1\r\n";
 		$header.= "Host: ".$host.":".$port."/staff/notify\r\n";
                 $header.= "Message: {\"message\":\"Job 1234 has changed to Scoping Phase\",\"priority\":\"3\",\"room\":\"4\"}\r\n";
 		$header.= "Connection: Upgrade\r\n";

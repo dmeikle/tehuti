@@ -34,6 +34,7 @@ class StaffController extends AbstractController{
     
     public function connect() {
         
+        return $this->view->render();
     }
     
     public function addStaff() {

@@ -66,16 +66,22 @@ class ServiceRouter extends Router {
         $this->container->get('EventDispatcher')->dispatch('server', ServerEvents::COMPONENT_INITIATE, new Event(ServerEvents::COMPONENT_INITIATE, array('request' => $request)));
         
         $nodeConfig = $this->findNodeByUri($config, $request);
+        
         $this->container->get('EventDispatcher')->configListeners(array($nodeConfig));
+        
         $componentName = $nodeConfig['defaults']['component'];
         $component = new $componentName($request, $this->container->get('Logger'));
         $component->setContainer($this->container);
-        
-        $this->container->get('EventDispatcher')->dispatch($request->getYmlKey(), ServerEvents::COMPONENT_REQUEST_START, new Event(ServerEvents::COMPONENT_REQUEST_START, array('request' => $request)));
+        $event = new Event(ServerEvents::COMPONENT_REQUEST_START, array('request' => $request, 'TokenFactory' => $this->container->get('TokenFactory')));
+        $this->container->get('EventDispatcher')->dispatch($request->getYmlKey(), ServerEvents::COMPONENT_REQUEST_START, $event);
        
+        echo "request in servicerouter\r\n";
+        print_r($request);
+        echo " returned from event\r\n";
+        print_r($event->getParam('clientToken'));
         $result = $component->handleRequest($nodeConfig);
         $this->container->get('EventDispatcher')->dispatch($request->getYmlKey(), ServerEvents::COMPONENT_REQUEST_COMPLETE, new Event(ServerEvents::COMPONENT_REQUEST_COMPLETE, array('request' => $request)));
-      
+        //$this->request->setAttribute('staffId', $event->getParam('clientToken')->getClient()->getId());
         return $result;
     }
 }

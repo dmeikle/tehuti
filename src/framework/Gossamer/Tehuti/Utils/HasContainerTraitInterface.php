@@ -9,15 +9,14 @@
  *  file that was distributed with this source code.
  */
 
-namespace Gossamer\Tehuti\Core;
+namespace Gossamer\Tehuti\Utils;
 
 /**
- * AbstractView
+ * HasContainerTraitInterface
  *
  * @author Dave Meikle
  */
-abstract class AbstractView {
-    use \Gossamer\Tehuti\Utils\ContainerTrait;
+interface HasContainerTraitInterface {
+   
     
-    public abstract function render(array $message = null);
 }

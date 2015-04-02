@@ -74,7 +74,7 @@ class Container {
      * @param string $objectPath
      * @param mixed $object
      */
-    public function set($key, $objectPath = null, $object = null) {
+    public function set($key, $objectPath = null, &$object = null) {
         $directory = $this->getDirectory();
         $directory[$key] = array('objectPath' => $objectPath, 'object' => $object);
         $this->directory = $directory;

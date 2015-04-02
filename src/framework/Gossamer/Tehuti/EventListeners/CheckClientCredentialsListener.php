@@ -15,8 +15,6 @@ use Gossamer\Horus\EventListeners\Event;
 use Gossamer\Horus\EventListeners\AbstractListener;
 use Gossamer\Tehuti\Tokens\ClientToken;
 use Gossamer\Tehuti\Clients\Client;
-use Gossamer\Tehuti\Core\SocketRequest;
-
 /**
  * ClientTokenListener
  *
@@ -24,7 +22,9 @@ use Gossamer\Tehuti\Core\SocketRequest;
  */
 class CheckClientCredentialsListener extends AbstractListener{
     
-    public function on_client_connect(Event $event) {
+    use \Gossamer\Tehuti\Utils\ContainerTrait;
+    
+    public function on_client_connect(Event &$event) {
        
         $requestToken = new ClientToken(new Client());
         $requestToken->setTokenString($event->getParam('request')->getToken());

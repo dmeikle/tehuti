@@ -191,10 +191,12 @@ class Server {
             $request = new SocketRequest($header);
             $event = new Event(ServerEvents::NEW_CONNECTION, array('ipAddress' => $ip, 'request' => $request));
             $this->container->get('EventDispatcher')->dispatch('all', ServerEvents::NEW_CONNECTION, $event);
-                         
+            
+            $response = $this->container->get('Router')->handleRequest($request);                
+            
             if(($event->getParam('request')->getAttribute('isServer'))) {
                
-                $response = $this->container->get('Router')->handleRequest($request);   
+                
                
                 if($response->getRespondToServer()) {
                     if(!is_null($response->getMessage())) {
@@ -208,12 +210,12 @@ class Server {
                 //$this->clients[] = $socket_new;                
             }else{
                 echo "new client\r\n";
-                $response = $this->container->get('Router')->handleRequest($request);   
+                
                 $event = new Event(ServerEvents::CLIENT_CONNECT, array('ipAddress' => $ip, 'request' => $request));
                 $event->setParam('TokenFactory', $this->container->get('TokenFactory'));
                 $this->container->get('EventDispatcher')->dispatch('client', ServerEvents::CLIENT_CONNECT, $event);
-              
-                $this->clients[] = $socket_new; //add socket to client array
+                print_r($request);
+                $this->clients[$request->getAttribute('staffId')] = $socket_new; //add socket to client array
             }
            
             //make room for new socket

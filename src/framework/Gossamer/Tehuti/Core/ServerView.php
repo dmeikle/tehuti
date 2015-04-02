@@ -18,12 +18,14 @@ namespace Gossamer\Tehuti\Core;
  */
 class ServerView extends AbstractView {
     
-    public function render(array $message) {
+    public function render(array $message = null) {
         
         $response = new Response();
         
         $response->setRespondToServer(true);
-        $response->setMessage(array('message' => $message['message']));
+        if(!is_null($message)) {
+            $response->setMessage(array('message' => $message['message']));
+        }
         
         return $response;
         

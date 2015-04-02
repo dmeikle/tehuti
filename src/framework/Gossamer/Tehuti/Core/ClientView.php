@@ -18,11 +18,12 @@ namespace Gossamer\Tehuti\Core;
  */
 class ClientView extends AbstractView {
     
-    public function render(array $message) {
+    public function render(array $message = null) {
         
         $response = new Response();
-        
-        $response->setMessage(array('type' => 'usermsg', 'name' => 'server', 'message' => $message['message'], 'color' => '#000000'));
+        if(!is_null($response)) {
+            $response->setMessage(array('type' => 'usermsg', 'name' => 'server', 'message' => $message['message'], 'color' => '#000000'));
+        }
         
         return $response;
         

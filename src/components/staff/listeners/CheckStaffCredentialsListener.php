@@ -22,16 +22,18 @@ use Gossamer\Tehuti\Clients\Client;
  */
 class CheckStaffCredentialsListener extends AbstractListener{
     
-    public function on_component_request_start(Event $event) {
+    public function on_component_request_start(Event &$event) {
         
         $requestToken = new ClientToken(new Client());
         $requestToken->setTokenString($event->getParam('request')->getToken());
-        echo "request token: ".$event->getParam('request')->getToken()."\r\n";
-        $clientToken = $event->getParam('TokenFactory')->checkToken($requestToken);
-        print_r($clientToken);
-        $this->request->setAttribute('staffId', $clientToken->getClient()->getId());
-        $event->setParam('clientToken', $clientToken);
         
+        $clientToken = $event->getParam('TokenFactory')->checkToken($requestToken);       
+        
+        $this->request->setAttribute('clientToken', $clientToken);
+      
+        $event->setParam('clientToken', $clientToken);
+        echo "request in credentialslistener\r\n";
+        print_r($this->request);
     }
     
 }

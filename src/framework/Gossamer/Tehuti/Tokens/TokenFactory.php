@@ -106,7 +106,10 @@ class TokenFactory {
         $token = new ClientToken($client);
         
         $this->tokens[$client->getId()] = $token;
-        $tokenString = $token->generateTokenString();
+        $tokenString = null;
+        do {
+            $tokenString = $token->generateTokenString();        
+        }while (strpos($tokenString, '/') > 0);
         echo "new token: $tokenString\r\n";
         
         return $tokenString;

@@ -26,10 +26,10 @@ class StaffController extends AbstractController{
     }
     
     public function notify() {
-        echo "notify\r\n";
+      
         $message = $this->model->notify();
         
-        return $this->view->render(array('message' => $message['message']));
+        return $this->view->render($message);
     }
     
     public function connect() {

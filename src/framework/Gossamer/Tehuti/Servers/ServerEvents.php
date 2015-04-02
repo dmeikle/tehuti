@@ -40,4 +40,8 @@ class ServerEvents {
     const CLIENT_CONNECT = 'client_connect';
     
     const CLIENT_NEW_TOKEN_REQUEST = 'new_token_request';
+    
+    const TOKEN_EXPIRED = 'token_expired';
+    
+    const TOKEN_MISSING = 'token_missing';
 }

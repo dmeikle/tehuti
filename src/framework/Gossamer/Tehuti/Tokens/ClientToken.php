@@ -69,6 +69,7 @@ class ClientToken extends SecurityToken {
      * @return string
      */
     public function toString() {
+        echo "token string: " . $this->getClient()->getIpAddress() . '|' . $this->getClient()->getCredentials() . '|' . $this->getClient()->getId()."\r\n";
         return $this->getClient()->getIpAddress() . '|' . $this->getClient()->getCredentials() . '|' . $this->getClient()->getId();
     }
 

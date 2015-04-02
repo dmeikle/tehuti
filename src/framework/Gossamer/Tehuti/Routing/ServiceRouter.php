@@ -27,7 +27,6 @@ class ServiceRouter extends Router {
     private $config = null;
     
     public function __construct(YAMLParser $parser) {
-        echo "new servicerouter\r\n";
         //first init the parent parameters
         parent::__construct($parser);
         //load all configurations in 1 shot since we want to keep the
@@ -72,16 +71,14 @@ class ServiceRouter extends Router {
         $componentName = $nodeConfig['defaults']['component'];
         $component = new $componentName($request, $this->container->get('Logger'));
         $component->setContainer($this->container);
+        
+        //we want any results from the event dispatcher related to this component so we can return them to server if needed
         $event = new Event(ServerEvents::COMPONENT_REQUEST_START, array('request' => $request, 'TokenFactory' => $this->container->get('TokenFactory')));
         $this->container->get('EventDispatcher')->dispatch($request->getYmlKey(), ServerEvents::COMPONENT_REQUEST_START, $event);
        
-        echo "request in servicerouter\r\n";
-        print_r($request);
-        echo " returned from event\r\n";
-        print_r($event->getParam('clientToken'));
         $result = $component->handleRequest($nodeConfig);
         $this->container->get('EventDispatcher')->dispatch($request->getYmlKey(), ServerEvents::COMPONENT_REQUEST_COMPLETE, new Event(ServerEvents::COMPONENT_REQUEST_COMPLETE, array('request' => $request)));
-        //$this->request->setAttribute('staffId', $event->getParam('clientToken')->getClient()->getId());
-        return $result;
+        
+        return array('eventParams' => $event->getParams(), 'Response' => $result);
     }
 }

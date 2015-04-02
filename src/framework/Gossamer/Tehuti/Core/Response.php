@@ -22,6 +22,42 @@ class Response {
     
     private $message = null;
     
+    private $recipientList;
+    
+    private $typeId;
+    
+    private $subject;
+    
+    private $timestamp;
+    
+    private $priorityLevel;
+    
+    private $messageType;
+    
+    private $senderName;
+    
+    private $senderColor;
+    
+    
+    public function __construct(array $message = null) {
+        if(!is_null($message)) {
+            $this->setMessage($message['message']);
+            $this->setPriorityLevel($message['priorityLevel']);
+            $this->setRecipientList($message['staffId']);
+            $this->setSubject($message['subject']);
+            $this->setTimestamp(strtotime("now"));
+            $this->setTypeId($message['typeId']);
+        }
+    }
+    public function getRecipientList() {
+        return $this->recipientList;
+    }
+
+    public function setRecipientList($recipientList) {
+        $this->recipientList = $recipientList;
+        return $this;
+    }
+
     public function getRespondToServer() {
         return $this->respondToServer;
     }
@@ -35,10 +71,77 @@ class Response {
         return $this;
     }
 
-    public function setMessage(array $message) {
+    public function setMessage($message) {
         $this->message = $message;
         return $this;
     }
 
+    public function getTypeId() {
+        return $this->typeId;
+    }
+
+    public function getSubject() {
+        return $this->subject;
+    }
+
+    public function getTimestamp() {
+        return $this->timestamp;
+    }
+
+    public function getPriorityLevel() {
+        return $this->priorityLevel;
+    }
+
+    public function setTypeId($typeId) {
+        $this->typeId = $typeId;
+        return $this;
+    }
+
+    public function setSubject($subject) {
+        $this->subject = $subject;
+        return $this;
+    }
+
+    public function setTimestamp($timestamp) {
+        $this->timestamp = $timestamp;
+        return $this;
+    }
+
+    public function setPriorityLevel($priorityLevel) {
+        $this->priorityLevel = $priorityLevel;
+        return $this;
+    }
+
+    public function getMessageType() {
+        return $this->messageType;
+    }
+
+    public function getSenderName() {
+        return $this->senderName;
+    }
+
+    public function getSenderColor() {
+        return $this->senderColor;
+    }
+
+    public function setMessageType($messageType) {
+        $this->messageType = $messageType;
+        return $this;
+    }
+
+    public function setSenderName($senderName) {
+        $this->senderName = $senderName;
+        return $this;
+    }
+
+    public function setSenderColor($senderColor) {
+        $this->senderColor = $senderColor;
+        return $this;
+    }
+
+    public function toArray() {
+        return array('type' => 'system', 'name' => 'server', 'message' => $this->message, 'color' => '#000000', 'typeId' => $this->typeId, 'subject' => $this->subject,
+            'date' => $this->timestamp, 'priority' => $this->priorityLevel);
+    }
 
 }

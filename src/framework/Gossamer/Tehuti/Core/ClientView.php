@@ -20,11 +20,10 @@ class ClientView extends AbstractView {
     
     public function render(array $message = null) {
         
-        $response = new Response();
-        if(!is_null($response)) {
-            $response->setMessage(array('type' => 'usermsg', 'name' => 'server', 'message' => $message['message'], 'color' => '#000000'));
-        }
+        $response = new Response($message);
+        $response->setRecipientList($message['staffId']);
         
+               
         return $response;
         
     }

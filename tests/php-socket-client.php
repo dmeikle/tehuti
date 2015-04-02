@@ -49,7 +49,7 @@ error_reporting(E_ALL);
             $request->setPriorityLevel(1);
             $request->setSubject("testing the subject");
             $request->setTypeId(2);
-            $request->setStaffId(array(2));
+            $request->setStaffId(array(85));
             
             return json_encode($request->toArray());
         }
@@ -66,7 +66,7 @@ error_reporting(E_ALL);
                 $header.= "Pragma: no-cache\r\n";
                 $header.= "Cache-Control: nocache\r\n";
 		$header.= "Upgrade: WebSocket\r\n";
-		$header.= "Origin: http://192.168.1.24\r\n";
+		$header.= "Origin: http://192.168.2.252\r\n";
                 $header.= "Sec-WebSocket-Version: 13\r\n";
 		$header.= "ServerAuthToken: 12345\r\n";
                 $header.= "User-Agent: CommandLine\r\n";
@@ -133,7 +133,7 @@ error_reporting(E_ALL);
         }
 }
  echo "new websocket\r\n";
-$WebSocketClient = new WebsocketClient('192.168.1.24', 9000);
+$WebSocketClient = new WebsocketClient('192.168.2.252', 9000);
 sleep(5);
 echo "sending data\r\n";
 echo $WebSocketClient->sendData('1337');

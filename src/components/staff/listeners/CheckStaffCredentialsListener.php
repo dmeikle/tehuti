@@ -30,10 +30,8 @@ class CheckStaffCredentialsListener extends AbstractListener{
         $clientToken = $event->getParam('TokenFactory')->checkToken($requestToken);       
         
         $this->request->setAttribute('clientToken', $clientToken);
-      
-        $event->setParam('clientToken', $clientToken);
-        echo "request in credentialslistener\r\n";
-        print_r($this->request);
+        
+        $event->setParam('ClientToken', $clientToken);
     }
     
 }

@@ -25,7 +25,7 @@ class TokenFactory {
     
     use \Gossamer\Horus\EventListeners\EventDispatcherTrait;
     
-    private $tokens;
+    private $tokens = array();
     
     const MAX_DECAY_TIME = 300;
     
@@ -76,7 +76,7 @@ class TokenFactory {
         $tokenTime = $token->getTimestamp();
         if(($currentTime - $tokenTime) > self::MAX_DECAY_TIME) {
             
-            $this->eventDispatcher->dispatch('all', 'token_expired');
+            $this->eventDispatcher->dispatch('all', \Gossamer\Tehuti\Servers\ServerEvents::TOKEN_EXPIRED, new Event(\Gossamer\Tehuti\Servers\ServerEvents::TOKEN_EXPIRED, array() ));
             return false;
         }                
         
@@ -94,7 +94,7 @@ class TokenFactory {
     
         if(!crypt($token->getTokenString(), $defaultToken->toString() == $defaultToken->toString())) {
             
-            $this->eventDispatcher->dispatch('all', 'token_missing');
+            $this->eventDispatcher->dispatch('all', \Gossamer\Tehuti\Servers\ServerEvents::TOKEN_MISSING, new Event(\Gossamer\Tehuti\Servers\ServerEvents::TOKEN_MISSING, array() ));
             
             return false;
         }
@@ -110,8 +110,7 @@ class TokenFactory {
         do {
             $tokenString = $token->generateTokenString();        
         }while (strpos($tokenString, '/') > 0);
-        echo "new token: $tokenString\r\n";
-        
+                
         return $tokenString;
     }
 }

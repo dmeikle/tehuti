@@ -20,6 +20,8 @@ use Gossamer\Horus\EventListeners\Event;
 use Gossamer\Tehuti\Routing\ServiceRouter;
 use Gossamer\Tehuti\Clients\ClientFactory;
 use Gossamer\Tehuti\Tokens\TokenFactory;
+use Gossamer\Tehuti\Core\Response;
+
 /**
  * Server
  *
@@ -93,9 +95,9 @@ class Server {
             //check for any incomming data
             while(socket_recv($changed_socket, $buf, 1024, 0) >= 1)
             {
-                echo "\r\n$buf\r\n";
+              
                 $received_text = $this->unmask($buf); //unmask data
-                echo "received:\r\n$received_text\r\n";
+              
                 $tst_msg = json_decode($received_text); //json decode 
                 
                 $user_name = $tst_msg->name; //sender name
@@ -123,20 +125,31 @@ class Server {
     
     private function sendMessage($msg)
     {
+        
         foreach($this->clients as $changed_socket)
         {
-            @socket_write($changed_socket,$msg,strlen($msg));
+            
         }
         
         return true;
     }
     
+    private function sendFilteredListMessage(Response $response) {
+        
+        $msg = $this->mask(json_encode($response->toArray()));
+       
+        $clients = array_intersect_key($this->clients, array_flip($response->getRecipientList()));
+       
+        foreach ($clients as $socket) {
+            @socket_write($socket,$msg,strlen($msg));
+        }
+        
+    }
    
     
     //Unmask incoming framed message
     private function unmask($text) {
        
-       echo "\r\n>>$text<<\r\n";
 	$length = ord($text[1]) & 127;
 	if($length == 126) {
 		$masks = substr($text, 4, 4);
@@ -184,45 +197,43 @@ class Server {
             
             $header = socket_read($socket_new, 1024); //read data sent by the socket
             $this->performHandshaking($header, $socket_new, $this->host, $this->port); //perform websocket handshake
-          // print_r($header);
+        
             socket_getpeername($socket_new, $ip); //get ip address of connected socket
             socket_set_option($socket_new, SOL_SOCKET, SO_KEEPALIVE, 1);
-            
+           
             $request = new SocketRequest($header);
             $event = new Event(ServerEvents::NEW_CONNECTION, array('ipAddress' => $ip, 'request' => $request));
             $this->container->get('EventDispatcher')->dispatch('all', ServerEvents::NEW_CONNECTION, $event);
             
-            $response = $this->container->get('Router')->handleRequest($request);                
-            
+            $rawResponse = $this->container->get('Router')->handleRequest($request);                
+            $eventParams = $rawResponse['eventParams'];
+            $response = $rawResponse['Response'];
+           
             if(($event->getParam('request')->getAttribute('isServer'))) {
-               
-                
-               
                 if($response->getRespondToServer()) {
                     if(!is_null($response->getMessage())) {
                         $message = $this->mask(json_encode($response->getMessage()));
                         @socket_write($socket_new, $message, strlen($message));
                     }                    
                 } else {
+                    
                     //ok - let's see if there's something to broadcast to our list
-                    $this->sendMessage($this->mask(json_encode($response->getMessage())));
+                    $this->sendFilteredListMessage($response);
                 }
                 //$this->clients[] = $socket_new;                
             }else{
-                echo "new client\r\n";
-                
+              
                 $event = new Event(ServerEvents::CLIENT_CONNECT, array('ipAddress' => $ip, 'request' => $request));
                 $event->setParam('TokenFactory', $this->container->get('TokenFactory'));
                 $this->container->get('EventDispatcher')->dispatch('client', ServerEvents::CLIENT_CONNECT, $event);
-                print_r($request);
-                $this->clients[$request->getAttribute('staffId')] = $socket_new; //add socket to client array
+               
+                $this->clients[$eventParams['ClientToken']->getClient()->getId()] = $socket_new; //add socket to client array
             }
            
             //make room for new socket
             $found_socket = array_search($socket, $list);
             unset($list[$found_socket]);
             
-            print_r($this->clients);
         }
         
         

@@ -15,6 +15,9 @@ use Gossamer\Aker\Components\Security\Core\ClientInterface;
 use Gossamer\Tehuti\Tokens\ClientToken;
 use Gossamer\Tehuti\Exceptions\InvalidSecurityTokenException;
 use Gossamer\Tehuti\Exceptions\TokenExpiredException;
+use Gossamer\Horus\EventListeners\Event;
+use Gossamer\Tehuti\Servers\ServerEvents;
+
 
 /**
  * TokenFactory
@@ -76,7 +79,7 @@ class TokenFactory {
         $tokenTime = $token->getTimestamp();
         if(($currentTime - $tokenTime) > self::MAX_DECAY_TIME) {
             
-            $this->eventDispatcher->dispatch('all', \Gossamer\Tehuti\Servers\ServerEvents::TOKEN_EXPIRED, new Event(\Gossamer\Tehuti\Servers\ServerEvents::TOKEN_EXPIRED, array() ));
+            $this->eventDispatcher->dispatch('all', ServerEvents::TOKEN_EXPIRED, new Event(ServerEvents::TOKEN_EXPIRED, array() ));
             return false;
         }                
         
@@ -94,7 +97,7 @@ class TokenFactory {
     
         if(!crypt($token->getTokenString(), $defaultToken->toString() == $defaultToken->toString())) {
             
-            $this->eventDispatcher->dispatch('all', \Gossamer\Tehuti\Servers\ServerEvents::TOKEN_MISSING, new Event(\Gossamer\Tehuti\Servers\ServerEvents::TOKEN_MISSING, array() ));
+            $this->eventDispatcher->dispatch('all', ServerEvents::TOKEN_MISSING, new Event(ServerEvents::TOKEN_MISSING, array() ));
             
             return false;
         }

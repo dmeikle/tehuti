@@ -46,7 +46,7 @@ class ServiceRouter extends Router {
     }
     
     public function handleRequest(SocketRequest &$request) {
-      
+  
         if(is_null($request->getComponent()) || strlen($request->getComponent()) == 0) {
            echo "no component found\r\n";
             //no rest style URI found
@@ -66,18 +66,23 @@ class ServiceRouter extends Router {
         
         $nodeConfig = $this->findNodeByUri($config, $request);
         
-        $this->container->get('EventDispatcher')->configListeners(array($nodeConfig));
-        
+        //we need a local-only dispatcher so we don't start building a 
+        //graveyard of dead component configs on the main service dispatcher
+        $nodeDispatcher = new \Gossamer\Horus\EventListeners\EventDispatcher(null, $this->container->get('Logger'), $request);
+        $nodeDispatcher->configListeners($config);
+       
         $componentName = $nodeConfig['defaults']['component'];
         $component = new $componentName($request, $this->container->get('Logger'));
         $component->setContainer($this->container);
-        
+       
         //we want any results from the event dispatcher related to this component so we can return them to server if needed
         $event = new Event(ServerEvents::COMPONENT_REQUEST_START, array('request' => $request, 'TokenFactory' => $this->container->get('TokenFactory')));
-        $this->container->get('EventDispatcher')->dispatch($request->getYmlKey(), ServerEvents::COMPONENT_REQUEST_START, $event);
        
+        $nodeDispatcher->dispatch($request->getYmlKey(), ServerEvents::COMPONENT_REQUEST_START, $event);
+      
         $result = $component->handleRequest($nodeConfig);
-        $this->container->get('EventDispatcher')->dispatch($request->getYmlKey(), ServerEvents::COMPONENT_REQUEST_COMPLETE, new Event(ServerEvents::COMPONENT_REQUEST_COMPLETE, array('request' => $request)));
+        $nodeDispatcher->dispatch($request->getYmlKey(), ServerEvents::COMPONENT_REQUEST_COMPLETE, new Event(ServerEvents::COMPONENT_REQUEST_COMPLETE, array('request' => $request)));
+        unset($nodeDispatcher);
         
         return array('eventParams' => $event->getParams(), 'Response' => $result);
     }

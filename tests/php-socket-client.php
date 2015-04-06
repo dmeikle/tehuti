@@ -45,11 +45,11 @@ error_reporting(E_ALL);
         private function getRequest() {
             $request = new ClientRequest();
             $request->setDate(strtolower("now"));
-            $request->setMessage("this is a new request object");
+            $request->setMessage("this is a new request object 1");
             $request->setPriorityLevel(1);
             $request->setSubject("testing the subject");
             $request->setTypeId(2);
-            $request->setStaffId(array(85));
+            $request->setStaffId(array(2,85));
             
             return json_encode($request->toArray());
         }
@@ -210,10 +210,10 @@ class ClientRequest {
 
     public function toArray() {
         return array(
-            'typeId' => $this->typeId, 
+            'TickerTypes_id' => $this->typeId, 
             'subject' => $this->subject, 
             'message' => $this->message, 
-            'date' => $this->date, 
+            'dateEntered' => $this->date, 
             'priorityLevel' => $this->priorityLevel, 
             'staffId' => $this->staffId
             );

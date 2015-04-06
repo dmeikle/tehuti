@@ -46,7 +46,7 @@ class Response {
             $this->setRecipientList($message['staffId']);
             $this->setSubject($message['subject']);
             $this->setTimestamp(strtotime("now"));
-            $this->setTypeId($message['typeId']);
+            $this->setTypeId($message['TickerTypes_id']);
         }
     }
     public function getRecipientList() {

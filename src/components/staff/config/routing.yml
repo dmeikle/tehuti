@@ -26,7 +26,7 @@ staff_updatepreferences:
 staff_notify:  
     pattern: staff/notify
     listeners:
-       # - { 'event': 'request_start', 'listener': 'core\eventlisteners\LoadListListener', 'datasource': 'datasource1', 'class': 'components\geography\models\ProvinceModel', 'cacheKey': 'Provinces' }
+        - { 'event': 'component_request_start', 'listener': 'components\staff\listeners\SaveNotificationListener', 'datasource': 'mysql' }
     defaults:
         component: components\staff\StaffComponent
         controller: components\staff\controllers\StaffController

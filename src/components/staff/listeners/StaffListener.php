@@ -42,9 +42,7 @@ class StaffListener extends AbstractListener{
     }
     
     public function on_component_initiate(Event $event) {
-       print_r($event);
-       die;
-       
+     
         $requestToken = new ClientToken(new Client());
         $requestToken->setTokenString($event->getParam('request')->getToken());
         echo "request token: ".$event->getParam('request')->getToken()."\r\n";

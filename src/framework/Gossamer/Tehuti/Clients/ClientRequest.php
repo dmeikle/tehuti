@@ -16,6 +16,7 @@ namespace Gossamer\Tehuti\Clients;
  *
  * @author Dave Meikle
  */
+
 class ClientRequest {
     
     private $typeId;
@@ -86,10 +87,10 @@ class ClientRequest {
 
     public function toArray() {
         return array(
-            'typeId' => $this->typeId, 
+            'TickerTypes_id' => $this->typeId, 
             'subject' => $this->subject, 
             'message' => $this->message, 
-            'date' => $this->date, 
+            'dateEntered' => $this->date, 
             'priorityLevel' => $this->priorityLevel, 
             'staffId' => $this->staffId
             );

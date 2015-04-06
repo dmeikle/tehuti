@@ -41,6 +41,8 @@ class Server {
     
     private $clientFactory;
     
+    private $mode;
+    
     public function __construct($host, $port) {
         $this->host = $host;
         $this->port = $port;
@@ -52,7 +54,19 @@ class Server {
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function execute() {
+    private function log($msg) {
+        $msg = ">> " . date("m/d/Y h:i:s",  strtotime("now")) . " $msg \r\n";
+        
+        if($this->mode == \Gossamer\Tehuti\System\Kernel::DEBUG_MODE) {
+            echo $msg;
+        }
+        
+        $this->container->get('Logger')->addDebug($msg);
+    }
+    
+    public function execute($mode) {
+        $this->mode = $mode;
+        
         $this->container->set('Router', null, new ServiceRouter($this->container->get('YamlParser')));
         $this->container->get('Router')->setContainer($this->container);
         $this->container->set('TokenFactory', null, new TokenFactory());
@@ -72,7 +86,7 @@ class Server {
         //create & add listning socket to the list
         $this->clients = array($socket);
         $this->container->get('EventDispatcher')->dispatch('server', ServerEvents::SERVER_STARTUP, new Event(ServerEvents::SERVER_STARTUP, array('host' => $this->host, 'port' => $this->port)));
-        echo "starting service\r\n";
+        $this->log('Starting Tehuti Messaging Service');
         //start endless loop, so that our script doesn't stop
         while (true) {
             //manage multiple connections
@@ -82,7 +96,7 @@ class Server {
                 $this->listenForMessages($changed);
             }catch(\Exception $e) {
                 
-                echo ">> error occurred: " . $e->getMessage() . "\r\n";
+                $this->log("Error occurred: " . $e->getMessage() . "\r\n");
             }                
         }
         // close the listening socket
@@ -94,8 +108,7 @@ class Server {
         foreach ($list as $changed_socket) {	
             //check for any incomming data
             while(socket_recv($changed_socket, $buf, 1024, 0) >= 1)
-            {
-              
+            {              
                 $received_text = $this->unmask($buf); //unmask data
               
                 $tst_msg = json_decode($received_text); //json decode 

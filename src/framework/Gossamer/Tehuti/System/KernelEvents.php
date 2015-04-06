@@ -27,4 +27,6 @@ class KernelEvents {
     const KERNEL_SERVER_INITIATE = 'server_initiate';
     
     const KERNEL_SERVER_START = 'server_start';
+    
+    const KERNEL_SERVER_SHUTDOWN = 'server_shutdown';
 }

@@ -3,7 +3,7 @@
 staff_newtoken:
     pattern: staff/newtoken
     listeners:
-        - { 'event': 'component_request_start', 'listener': 'components\staff\listeners\StaffListener', 'datasource': 'mysql' }
+    #    - { 'event': 'component_request_start', 'listener': 'components\staff\listeners\StaffListener', 'datasource': 'mysql' }
     defaults:
         component: components\staff\StaffComponent
         controller: components\staff\controllers\StaffController

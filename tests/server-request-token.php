@@ -53,7 +53,7 @@ class WebsocketClient
                 $header.= "Cache-Control: nocache\r\n";
 		$header.= "Upgrade: WebSocket\r\n";
                 $header.= "StaffIp: 192.168.2.120\r\n";
-                $header.= "StaffId: 85\r\n";
+                $header.= "StaffId: 2\r\n";
 		$header.= "Origin: http://192.168.2.252\r\n";
                 $header.= "Sec-WebSocket-Version: 13\r\n";
 		$header.= "ServerAuthToken: 12345\r\n";

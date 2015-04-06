@@ -52,25 +52,9 @@ class Kernel {
         
         $server = new Server($config['server']['host'], $config['server']['port']);
         $server->setContainer($this->container);
-        $server->execute();
-        
-//
-//        //EventDispatcher is created in bootstrap
-//        //first, run any security checks before starting the request
-//        $event = new Event(KernelEvents::ENTRY_POINT, $httpRequest);
-//
-//        $this->container->get('EventDispatcher')->dispatch('all', KernelEvents::REQUEST_START);
-//
-//        //still here? ok, now start the request
-//        $event = new Event(KernelEvents::REQUEST_START, $httpRequest);
-//        $this->container->get('EventDispatcher')->dispatch(__YML_KEY, KernelEvents::REQUEST_START);
-//
-//        $this->logger->addDebug('dispatcher started in index - state set to ' . KernelEvents::REQUEST_START);
-//
-//        $cmd = new $componentName($controllerName, $viewName, $modelName, $method, $httpRequest->getParameters(), $this->logger, $this->getLayoutType());
-//        $cmd->setContainer($this->container);
-//
-//        return $cmd->handleRequest($httpRequest, $httpResponse);
+        $server->execute($mode);
+
+        $this->container->get('EventDispatcher')->dispatch('all', KernelEvents::KERNEL_SERVER_SHUTDOWN, new Event(KernelEvents::KERNEL_SERVER_SHUTDOWN, array()));
     }
 
     /**

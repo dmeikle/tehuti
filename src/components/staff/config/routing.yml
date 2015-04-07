@@ -43,4 +43,16 @@ staff_connect:
         controller: components\staff\controllers\StaffController
         model: components\staff\models\StaffModel
         view: Gossamer\Tehuti\Core\ClientView
-        method: connect          
+        method: connect       
+        
+staff_list_notifications: 
+    pattern: staff/history
+    listeners:
+     #  - { 'event': 'component_request_start', 'listener': 'components\staff\listeners\CheckStaffCredentialsListener' }
+    defaults:
+        component: components\staff\StaffComponent
+        controller: components\staff\controllers\StaffController
+        model: components\staff\models\StaffModel
+        view: Gossamer\Tehuti\Core\ClientView
+        method: listNotificationHistory   
+        datasource: mysql

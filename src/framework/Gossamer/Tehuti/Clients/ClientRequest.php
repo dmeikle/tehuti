@@ -17,82 +17,52 @@ namespace Gossamer\Tehuti\Clients;
  * @author Dave Meikle
  */
 
-class ClientRequest {
+class ClientRequest extends Request {
+//    
+//   $user_name = $tst_msg->name; //sender name
+//                $user_message = $tst_msg->message; //message text
+//                $user_color = $tst_msg->color; //color
+//                //prepare data to be sent to client
+//                $response_text = $this->mask(json_encode(array('type'=>'usermsg', 'name'=>$user_name, 'message'=>$user_message, 'color'=>$user_color)));
+
+    private $name;
     
-    private $typeId;
+    private $color;
     
-    private $subject;
-    
-    private $message;
-    
-    private $date;
-    
-    private $priorityLevel;
-    
-    private $staffId = array();
-    
-    public function getTypeId() {
-        return $this->typeId;
+    public function getName() {
+        return $this->name;
     }
 
-    public function getSubject() {
-        return $this->subject;
+    public function getColor() {
+        if(strlen($this->color) == 0) {
+            $this->color = '#ffffff';
+        }
+        
+        return $this->color;
     }
 
-    public function getMessage() {
-        return $this->message;
-    }
-
-    public function getDate() {
-        return $this->date;
-    }
-
-    public function getPriorityLevel() {
-        return $this->priorityLevel;
-    }
-
-    public function getStaffId() {
-        return $this->staffId;
-    }
-
-    public function setTypeId($typeId) {
-        $this->typeId = $typeId;
+    public function setName($name) {
+        $this->name = $name;
+        
         return $this;
     }
 
-    public function setSubject($subject) {
-        $this->subject = $subject;
-        return $this;
-    }
-
-    public function setMessage($message) {
-        $this->message = $message;
-        return $this;
-    }
-
-    public function setDate($date) {
-        $this->date = $date;
-        return $this;
-    }
-
-    public function setPriorityLevel($priorityLevel) {
-        $this->priorityLevel = $priorityLevel;
-        return $this;
-    }
-
-    public function setStaffId(array $staffId) {
-        $this->staffId = $staffId;
+    public function setColor($color) {
+        $this->color = $color;
+        
         return $this;
     }
 
     public function toArray() {
         return array(
-            'TickerTypes_id' => $this->typeId, 
-            'subject' => $this->subject, 
-            'message' => $this->message, 
-            'dateEntered' => $this->date, 
-            'priorityLevel' => $this->priorityLevel, 
-            'staffId' => $this->staffId
-            );
+            'TickerTypes_id' => $this->getTypeID(), 
+            'subject' => $this->getSubject(), 
+            'message' => $this->getMessage(), 
+            'dateEntered' => $this->getDate(), 
+            'priorityLevel' => $this->getPriorityLevel(), 
+            'staffId' => $this->getStaffId(),
+            'name' => $this->name,
+            'color' => $this->getColor()
+        );
     }
 }

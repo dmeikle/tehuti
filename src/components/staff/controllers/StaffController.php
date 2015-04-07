@@ -19,7 +19,7 @@ use Gossamer\Tehuti\Core\AbstractController;
 class StaffController extends AbstractController{
    
     public function getNewToken() {
-        echo "getnewtoken\r\n";
+      
         $token = $this->model->getNewToken();
         
         return $this->view->render(array('message' => 'NewToken: ' . $token));
@@ -27,7 +27,8 @@ class StaffController extends AbstractController{
     
     public function notify() {
       
-        $message = $this->model->notify();
+        $message = $this->model->notify();        
+        $message['messageId'] = $this->request->getAttribute('messageId');
         
         return $this->view->render($message);
     }
@@ -37,7 +38,15 @@ class StaffController extends AbstractController{
         return $this->view->render();
     }
     
-    public function addStaff() {
+    public function listNotificationHistory() {
+       
         
+        $params = $this->request->getRequestParameters();
+        $result = $this->model->getNotificationHistory($this->request->getClientId(), $params['start'], $params['rows']);
+       
+        if(is_null($result)) {
+            $result = array();
+        }
+        return $this->view->renderList($this->request->getClientId(), $result);
     }
 }

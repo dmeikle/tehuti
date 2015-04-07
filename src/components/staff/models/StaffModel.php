@@ -52,4 +52,13 @@ class StaffModel extends AbstractModel {
         return $client;
     }
     
+    public function getNotificationHistory($clientId, $start, $limit) {
+        if($start == -1) {
+            return $this->dataSource->preparedQuery('select tf.* from TickerFeeds tf left join TickerFeedRecipients tfr on tfr.TickerFeeds_id = tf.id '
+                . 'where tfr.Staff_id = ? order by tf.id desc limit ?', array('ii', $clientId, $limit));
+        } 
+        
+        return $this->dataSource->preparedQuery('select tf.* from TickerFeeds tf left join TickerFeedRecipients tfr on tfr.TickerFeeds_id = tf.id '
+                . 'where tfr.Staff_id = ? and tf.id < ? order by tf.id desc limit ?', array('iii', $clientId, $start, $limit));
+    }
 }

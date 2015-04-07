@@ -28,5 +28,12 @@ class ClientView extends AbstractView {
         
     }
 
+    public function renderList($clientId, array $messages) {
+        
+        $response = new ResponseList($messages);
+        $response->setRecipientList(array($clientId));
+        
+        return $response;
+    }
 
 }

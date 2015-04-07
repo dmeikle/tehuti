@@ -18,6 +18,8 @@ namespace Gossamer\Tehuti\Core;
  */
 class Response {
     
+    private $messageId;
+    
     private $respondToServer = false;
     
     private $message = null;
@@ -41,6 +43,7 @@ class Response {
     
     public function __construct(array $message = null) {
         if(!is_null($message)) {
+            $this->setMessageId($message['messageId']);
             $this->setMessage($message['message']);
             $this->setPriorityLevel($message['priorityLevel']);
             $this->setRecipientList($message['staffId']);
@@ -49,6 +52,18 @@ class Response {
             $this->setTypeId($message['TickerTypes_id']);
         }
     }
+    
+    public function getMessageId() {
+        return $this->messageId;
+    }
+
+    public function setMessageId($messageId) {
+        $this->messageId = $messageId;
+        
+        return $this;
+    }
+
+        
     public function getRecipientList() {
         return $this->recipientList;
     }
@@ -140,8 +155,8 @@ class Response {
     }
 
     public function toArray() {
-        return array('type' => 'system', 'name' => 'server', 'message' => $this->message, 'color' => '#000000', 'typeId' => $this->typeId, 'subject' => $this->subject,
-            'date' => $this->timestamp, 'priority' => $this->priorityLevel);
+        return array('type' => 'single', 'name' => 'server', 'message' => $this->message, 'color' => '#000000', 'typeId' => $this->typeId, 'subject' => $this->subject,
+            'date' => $this->timestamp, 'priority' => $this->priorityLevel, 'id' => $this->messageId);
     }
 
 }

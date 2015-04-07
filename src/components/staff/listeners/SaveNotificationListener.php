@@ -42,6 +42,8 @@ class SaveNotificationListener extends AbstractListener{
             $tickerFeed = current($result);
             $cmd->execute($this->buildRecipientArray($params['staffId'], $tickerFeed['id']));
         }
+        
+        $this->request->setAttribute('messageId', $result);
     }
     
     private function buildRecipientArray(array $staffIdList, $tickerId) {

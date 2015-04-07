@@ -49,19 +49,18 @@ class SocketRequest extends Request {
     }
 
         
-    private function getParameters($header) {
+    protected function getParameters($header) {
        
         $lines = preg_split("/\r\n/", $header);
         $get = urldecode(array_shift($lines));
         $pieces = explode(' ', $get);
-print_r($pieces);
+
         if(count($pieces) == 3) {
             $chunks = explode('?', $pieces[1]);
 
             $this->token = array_pop($chunks);
             $this->uri = implode('/', $chunks);
             
-            echo "token: ".$this->token."\r\nuri: ".$this->uri."\r\n";
         }
     }
     
@@ -95,9 +94,10 @@ print_r($pieces);
         return $this->uri;
     }
     
-    private function getComponentName() {
+    protected function getComponentName() {
         
         $pieces = explode('/', $this->getUri());
+        
         if(count($pieces) > 0 && strlen($pieces[0]) == 0) {
             array_shift($pieces);
         }

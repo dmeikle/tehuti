@@ -15,7 +15,8 @@ use Gossamer\Tehuti\Core\SocketRequest;
 use Monolog\Logger;
 
 use Gossamer\Tehuti\Exceptions\ParameterNotPassedException;
-
+use Gossamer\Pesedget\Database\EntityManager;
+use Gossamer\Tehuti\Database\MySQlDatasource;
 use Gossamer\Tehuti\Exceptions\HandlerNotCallableException;
 use core\eventlisteners\Event;
 
@@ -97,7 +98,9 @@ abstract class AbstractComponent {
                 return;
             }
             $model->setContainer($this->container);
-            
+            if(array_key_exists('datasource', $config['defaults'])) {
+                $model->setDatasource(new MySQlDatasource(EntityManager::getInstance()->getConnection($config['defaults']['datasource'])));
+            }
             //$model->setDatasource($this->getDatasource());
 
             $controller = new $controllerName($model, $view, $this->request, $this->logger);

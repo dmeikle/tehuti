@@ -48,7 +48,7 @@ class ServiceRouter extends Router {
     public function handleRequest(SocketRequest &$request) {
   
         if(is_null($request->getComponent()) || strlen($request->getComponent()) == 0) {
-           echo "no component found\r\n";
+           //echo "no component found\r\n";
             //no rest style URI found
             return null;
         }

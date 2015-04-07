@@ -49,7 +49,7 @@ error_reporting(E_ALL);
             $request->setPriorityLevel(1);
             $request->setSubject("testing the subject");
             $request->setTypeId(2);
-            $request->setStaffId(array(2));
+            $request->setStaffId(array(2,85));
             
             return json_encode($request->toArray());
         }

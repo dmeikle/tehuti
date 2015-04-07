@@ -28,9 +28,9 @@ class CheckClientCredentialsListener extends AbstractListener{
        
         $requestToken = new ClientToken(new Client());
         $requestToken->setTokenString($event->getParam('request')->getToken());
-        echo "request token: ".$event->getParam('request')->getToken()."\r\n";
+       
         $clientToken = $event->getParam('TokenFactory')->checkToken($requestToken);
-        print_r($clientToken);
+      
         $event->setParam('clientToken', $clientToken);
     }
     

@@ -103,23 +103,53 @@ class Server {
         socket_close($sock);
     }
     
+    private function getClientRequest($buffer) {
+        $receivedText = $this->unmask($buffer);
+        //turn it into a standard array
+        $rawRequest = json_decode($receivedText, true);
+        
+        $request = null;
+        //ok - now to determine if they are sending a message or
+        //asking for more results
+        if(array_key_exists('message', $clientRequest)) {
+            $request = new \Gossamer\Tehuti\Clients\ClientRequest();
+        } else {
+            
+        }
+    }
     private function listenForMessages(array $list) {
+        
         //loop through all connected sockets
-        foreach ($list as $changed_socket) {	
+        foreach ($list as $clientId => $changed_socket) {	
+           
             //check for any incomming data
             while(socket_recv($changed_socket, $buf, 1024, 0) >= 1)
             {              
                 $received_text = $this->unmask($buf); //unmask data
-              
-                $tst_msg = json_decode($received_text); //json decode 
+                $clientRequest = new \Gossamer\Tehuti\Clients\ClientSocketRequest($clientId, $received_text);
                 
-                $user_name = $tst_msg->name; //sender name
-                $user_message = $tst_msg->message; //message text
-                $user_color = $tst_msg->color; //color
-                //prepare data to be sent to client
-                $response_text = $this->mask(json_encode(array('type'=>'usermsg', 'name'=>$user_name, 'message'=>$user_message, 'color'=>$user_color)));
-               
-                $this->sendMessage($response_text); //send data
+//                $tst_msg = json_decode($received_text); //json decode 
+//                
+//                $user_name = $tst_msg->name; //sender name
+//                $user_message = $tst_msg->message; //message text
+//                $user_color = $tst_msg->color; //color
+//                //prepare data to be sent to client
+//                $response_text = $this->mask(json_encode(array('type'=>'usermsg', 'name'=>$user_name, 'message'=>$user_message, 'color'=>$user_color)));
+
+                
+             //   $this->sendMessage($response_text); //send data
+                
+//                $request = new SocketRequest($header);
+//            $event = new Event(ServerEvents::NEW_CONNECTION, array('ipAddress' => $ip, 'request' => $request));
+//            $this->container->get('EventDispatcher')->dispatch('all', ServerEvents::NEW_CONNECTION, $event);
+//            
+           $rawResponse = $this->container->get('Router')->handleRequest($clientRequest); 
+           $response = $rawResponse['Response'];
+           if(!is_null($response) && $response instanceof Response) {
+               $this->sendFilteredListMessage($response);
+           }
+           
+          // print_r($rawResponse);
                 break 2; //exit this loop
             }
             $buf = @socket_read($changed_socket, 1024, PHP_NORMAL_READ);
@@ -139,9 +169,9 @@ class Server {
     private function sendMessage($msg)
     {
         
-        foreach($this->clients as $changed_socket)
+        foreach($this->clients as $socket)
         {
-            
+            @socket_write($socket,$msg,strlen($msg));
         }
         
         return true;

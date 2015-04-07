@@ -16,7 +16,7 @@ use Monolog\Logger;
 
 
 
-use core\datasources\DataSourceInterface;
+use Gossamer\Tehuti\Database\DataSourceInterface;
 use libraries\utils\Pagination;
 use Gossamer\Caching\CacheManager;
 use core\components\mappings\models\MappingModel;

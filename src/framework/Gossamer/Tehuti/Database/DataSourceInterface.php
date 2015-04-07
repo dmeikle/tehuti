@@ -9,18 +9,17 @@
  *  file that was distributed with this source code.
  */
 
-namespace Gossamer\Tehuti\EventListeners;
-
-use Gossamer\Horus\EventListeners\Event;
+namespace Gossamer\Tehuti\Database;
 
 /**
- * AuthorizationListener
+ * DataSourceInterface
  *
  * @author Dave Meikle
  */
-class CheckServerCredentialsListener {
-   
-    public function on_client_server_connect(Event $event) {
-        
-    }
+interface DataSourceInterface {
+    
+    
+    public function query($query);
+    
+    public function preparedQuery($query, array $params);
 }

@@ -29,7 +29,8 @@ class EventDispatcherTest extends \tests\BaseTest {
         
         $dispatcher = new EventDispatcher(null, $this->getLogger(), $request);
         $dispatcher->configListeners($this->getListenerConfig());
-        $dispatcher->dispatch('all', 'client_connect', array());
+        $event = new Event('client_connect', array( 'TokenFactory' => $tokenFactory));
+        $dispatcher->dispatch('client', 'client_connect', $event);
               
         $this->assertNotNull($request->getAttribute('result'));
         $this->assertEquals($request->getAttribute('result'), 'TestListener loaded successfully');

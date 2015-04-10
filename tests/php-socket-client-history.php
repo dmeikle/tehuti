@@ -26,8 +26,7 @@ class WebsocketClient
  
 	public function sendData($data)
 	{
-            ini_set('display_errors', 1); 
-error_reporting(E_ALL);
+            
             $data = json_encode(array (
                 'type' => 'usermsg',
 		'name' => 'server2',

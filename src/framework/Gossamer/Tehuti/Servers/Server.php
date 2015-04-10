@@ -11,8 +11,7 @@
 
 namespace Gossamer\Tehuti\Servers;
 
-ini_set('display_errors', 1); 
-error_reporting(E_ALL);
+
 
 use Gossamer\Horus\EventListeners\EventDispatcher;
 use Gossamer\Tehuti\Core\SocketRequest;
@@ -127,32 +126,17 @@ class Server {
             {              
                 $received_text = $this->unmask($buf); //unmask data
                 $clientRequest = new \Gossamer\Tehuti\Clients\ClientSocketRequest($clientId, $received_text);
-                
-//                $tst_msg = json_decode($received_text); //json decode 
-//                
-//                $user_name = $tst_msg->name; //sender name
-//                $user_message = $tst_msg->message; //message text
-//                $user_color = $tst_msg->color; //color
-//                //prepare data to be sent to client
-//                $response_text = $this->mask(json_encode(array('type'=>'usermsg', 'name'=>$user_name, 'message'=>$user_message, 'color'=>$user_color)));
+    
+                $rawResponse = $this->container->get('Router')->handleRequest($clientRequest); 
+                $response = $rawResponse['Response'];
+                if(!is_null($response) && $response instanceof Response) {
+                    $this->sendFilteredListMessage($response);
+                }
 
-                
-             //   $this->sendMessage($response_text); //send data
-                
-//                $request = new SocketRequest($header);
-//            $event = new Event(ServerEvents::NEW_CONNECTION, array('ipAddress' => $ip, 'request' => $request));
-//            $this->container->get('EventDispatcher')->dispatch('all', ServerEvents::NEW_CONNECTION, $event);
-//            
-           $rawResponse = $this->container->get('Router')->handleRequest($clientRequest); 
-           $response = $rawResponse['Response'];
-           if(!is_null($response) && $response instanceof Response) {
-               $this->sendFilteredListMessage($response);
-           }
-           
-          // print_r($rawResponse);
                 break 2; //exit this loop
             }
             $buf = @socket_read($changed_socket, 1024, PHP_NORMAL_READ);
+            
             if ($buf === false) { // check disconnected client
                 // remove client for $clients array
                 $found_socket = array_search($changed_socket, $this->clients);
@@ -239,6 +223,7 @@ class Server {
             $socket_new = socket_accept($socket); //accept new socket
             
             $header = socket_read($socket_new, 1024); //read data sent by the socket
+           
             $this->performHandshaking($header, $socket_new, $this->host, $this->port); //perform websocket handshake
         
             socket_getpeername($socket_new, $ip); //get ip address of connected socket
@@ -251,7 +236,7 @@ class Server {
             $rawResponse = $this->container->get('Router')->handleRequest($request);                
             $eventParams = $rawResponse['eventParams'];
             $response = $rawResponse['Response'];
-           
+          
             if(($event->getParam('request')->getAttribute('isServer'))) {
                 if($response->getRespondToServer()) {
                     if(!is_null($response->getMessage())) {
@@ -295,6 +280,7 @@ class Server {
 			$headers[$matches[1]] = $matches[2];
 		}
 	}
+       
 	$secKey = $headers['Sec-WebSocket-Key'];
 	$secAccept = base64_encode(pack('H*', sha1($secKey . '258EAFA5-E914-47DA-95CA-C5AB0DC85B11')));
 	//hand shaking header

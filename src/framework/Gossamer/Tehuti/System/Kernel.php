@@ -43,46 +43,22 @@ class Kernel {
      * 
      * @return string|JSON - the completed html or json array
      */
-    public function run($mode = 'prod') {
+    public function run($mode = 'prod', $port = null) {
 
         //load the server config and start the service
         $config = loadConfiguration('config');
-        
+        if(is_null($port)) {
+            //if they're not overriding in bootstrap, look in the standard configs
+            $port = $config['server']['port'];
+        }
         $this->container->get('EventDispatcher')->dispatch('all', KernelEvents::KERNEL_SERVER_INITIATE, new Event(KernelEvents::KERNEL_SERVER_INITIATE, array()));
         
-        $server = new Server($config['server']['host'], $config['server']['port']);
+        $server = new Server($config['server']['host'], $port);
         $server->setContainer($this->container);
         $server->execute($mode);
 
         $this->container->get('EventDispatcher')->dispatch('all', KernelEvents::KERNEL_SERVER_SHUTDOWN, new Event(KernelEvents::KERNEL_SERVER_SHUTDOWN, array()));
     }
 
-    /**
-     * determines if we are dealing with a computer or mobile device
-     * 
-     * @return array
-     */
-    private function getLayoutType() {
-        $detector = new MobileDetect();
-        $isMobile = $detector->isMobile();
-        $isTablet = $detector->isTablet();
-        unset($detector);
-
-        return array('isMobile' => $isMobile, 'isTablet' => $isTablet);
-    }
-
-    /**
-     * creates any session params in the event we are reloading the page so
-     * the params are available for access after the redirect.
-     * 
-     * @param HTTPRequest $request
-     */
-    private function configSessionParamsToRequest(HTTPRequest &$request) {
-        $request->setAttribute('ERROR_RESULT', getSession('ERROR_RESULT'));
-        $request->setAttribute('POSTED_PARAMS', getSession('POSTED_PARAMS'));
-       
-        setSession('ERROR_RESULT', null);
-        setSession('POSTED_PARAMS', null);
-    }
 
 }

@@ -55,7 +55,7 @@ class Server {
 
     private function log($msg) {
         $msg = ">> " . date("m/d/Y h:i:s",  strtotime("now")) . " $msg \r\n";
-        
+        echo $this->mode;
         if($this->mode == \Gossamer\Tehuti\System\Kernel::DEBUG_MODE) {
             echo $msg;
         }
@@ -65,6 +65,7 @@ class Server {
     
     public function execute($mode) {
         $this->mode = $mode;
+        $this->log('Starting Tehuti Messaging Service on port ' . $this->port);
         
         $this->container->set('Router', null, new ServiceRouter($this->container->get('YamlParser')));
         $this->container->get('Router')->setContainer($this->container);
@@ -85,7 +86,7 @@ class Server {
         //create & add listning socket to the list
         $this->clients = array($socket);
         $this->container->get('EventDispatcher')->dispatch('server', ServerEvents::SERVER_STARTUP, new Event(ServerEvents::SERVER_STARTUP, array('host' => $this->host, 'port' => $this->port)));
-        $this->log('Starting Tehuti Messaging Service');
+        $this->log('Tehuti Messaging Service Online');
         //start endless loop, so that our script doesn't stop
         while (true) {
             //manage multiple connections
@@ -117,7 +118,8 @@ class Server {
         }
     }
     private function listenForMessages(array $list) {
-        
+        ini_set('display_errors', 1); 
+error_reporting(E_ALL);
         //loop through all connected sockets
         foreach ($list as $clientId => $changed_socket) {	
            
@@ -129,6 +131,7 @@ class Server {
     
                 $rawResponse = $this->container->get('Router')->handleRequest($clientRequest); 
                 $response = $rawResponse['Response'];
+             
                 if(!is_null($response) && $response instanceof Response) {
                     $this->sendFilteredListMessage($response);
                 }
@@ -166,7 +169,7 @@ class Server {
         $msg = $this->mask(json_encode($response->toArray()));
        
         $clients = array_intersect_key($this->clients, array_flip($response->getRecipientList()));
-       
+    
         foreach ($clients as $socket) {
             @socket_write($socket,$msg,strlen($msg));
         }
@@ -221,12 +224,13 @@ class Server {
         //check for new socket
         if (in_array($socket, $list)) {
             $socket_new = socket_accept($socket); //accept new socket
-            
+            $this->log('new request detected');
             $header = socket_read($socket_new, 1024); //read data sent by the socket
            
             $this->performHandshaking($header, $socket_new, $this->host, $this->port); //perform websocket handshake
         
             socket_getpeername($socket_new, $ip); //get ip address of connected socket
+            $this->log('new request is ip ' . $ip);
             socket_set_option($socket_new, SOL_SOCKET, SO_KEEPALIVE, 1);
            
             $request = new SocketRequest($header);
@@ -236,21 +240,22 @@ class Server {
             $rawResponse = $this->container->get('Router')->handleRequest($request);                
             $eventParams = $rawResponse['eventParams'];
             $response = $rawResponse['Response'];
-          
+           
             if(($event->getParam('request')->getAttribute('isServer'))) {
+            $this->log('New Server Socket Request Received');
                 if($response->getRespondToServer()) {
                     if(!is_null($response->getMessage())) {
                         $message = $this->mask(json_encode($response->getMessage()));
                         @socket_write($socket_new, $message, strlen($message));
                     }                    
                 } else {
-                    
+                    $this->log('Sending Server Filtered Message To Recipient List');
                     //ok - let's see if there's something to broadcast to our list
                     $this->sendFilteredListMessage($response);
                 }
                 //$this->clients[] = $socket_new;                
             }else{
-              
+                $this->log('New Client Socket Received');
                 $event = new Event(ServerEvents::CLIENT_CONNECT, array('ipAddress' => $ip, 'request' => $request));
                 $event->setParam('TokenFactory', $this->container->get('TokenFactory'));
                 $this->container->get('EventDispatcher')->dispatch('client', ServerEvents::CLIENT_CONNECT, $event);

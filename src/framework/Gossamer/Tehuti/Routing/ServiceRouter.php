@@ -46,9 +46,9 @@ class ServiceRouter extends Router {
     }
     
     public function handleRequest(SocketRequest &$request) {
-  
+
         if(is_null($request->getComponent()) || strlen($request->getComponent()) == 0) {
-           //echo "no component found\r\n";
+          
             //no rest style URI found
             return null;
         }
@@ -60,12 +60,13 @@ class ServiceRouter extends Router {
             
             return null;
         }
+        
         if($config == null) {
             $this->addDebug('config was null for ' . $request->getComponent() . ' - returning from handleRequest');
             
             return null;
         }
-        
+       
         //add any event listeners that are required for this component
         $this->container->get('EventDispatcher')->configListeners($config);
         $this->container->get('EventDispatcher')->dispatch('server', ServerEvents::COMPONENT_INITIATE, new Event(ServerEvents::COMPONENT_INITIATE, array('request' => $request)));
@@ -87,6 +88,9 @@ class ServiceRouter extends Router {
         $nodeDispatcher->dispatch($request->getYmlKey(), ServerEvents::COMPONENT_REQUEST_START, $event);
       
         $result = $component->handleRequest($nodeConfig);
+        if(is_null($result)) {
+            throw new \Exception('Component rendered null - check for return statement');
+        }
         $nodeDispatcher->dispatch($request->getYmlKey(), ServerEvents::COMPONENT_REQUEST_COMPLETE, new Event(ServerEvents::COMPONENT_REQUEST_COMPLETE, array('request' => $request)));
         unset($nodeDispatcher);
         

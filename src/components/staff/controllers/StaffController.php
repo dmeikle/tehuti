@@ -38,8 +38,7 @@ class StaffController extends AbstractController{
         return $this->view->render();
     }
     
-    public function listNotificationHistory() {
-       
+    public function listNotificationHistory() {       
         
         $params = $this->request->getRequestParameters();
         $result = $this->model->getNotificationHistory($this->request->getClientId(), $params['start'], $params['rows']);

@@ -29,12 +29,17 @@ class SocketRequest extends Request {
     
     protected $token;
 
+    protected $parameters;
+    
+    protected $verb;
+    
     public function __construct($header) {
-       
+        echo "construct socketrequest\r\n";
+       echo "new header:\r\n" . $header ."\r\n\r\n";
         $this->parseHeader($header);
-       
         $this->parseUri();
-        $this->getParameters($header);
+       
+        $this->setParameters($header);
         $this->setComponent($this->getComponentName());
         
     }
@@ -49,9 +54,10 @@ class SocketRequest extends Request {
     }
 
         
-    protected function getParameters($header) {
-       
+    protected function setParameters($header) {
+       echo "setting parameters\r\n";
         $lines = preg_split("/\r\n/", $header);
+     
         $get = urldecode(array_shift($lines));
         $pieces = explode(' ', $get);
 
@@ -60,8 +66,14 @@ class SocketRequest extends Request {
 
             $this->token = array_pop($chunks);
             $this->uri = implode('/', $chunks);
-            
+        print_r($chunks);
+            list($empty, $this->component, $this->verb, $parameter) = array_pad(explode('/', current($chunks)),4,null);
+            $this->parameters = array($parameter);
         }
+    }
+    
+    public function getParameters() {
+        return $this->parameters;
     }
     
     public function getComponent() {
@@ -95,9 +107,9 @@ class SocketRequest extends Request {
     }
     
     protected function getComponentName() {
-        
+     
         $pieces = explode('/', $this->getUri());
-        
+      
         if(count($pieces) > 0 && strlen($pieces[0]) == 0) {
             array_shift($pieces);
         }
@@ -117,6 +129,10 @@ class SocketRequest extends Request {
                 $this->headers[$matches[1]] = $matches[2];
             }
         }
+        if(array_key_exists('Message', $this->headers)) {
+            $this->headers['Message'] = str_replace('"dateEntered":"now"', '"dateEntered":"' . date('Y-m-d').'<br>' . date('h:i:s') . '"', $this->headers['Message']);
+        }
+        
     }
     
     public function getHeader($key) {

@@ -14,6 +14,7 @@ define('__METHOD', 'GET');
 
 //include_once('phpunit.configuration.php');
 require_once(__SITE_PATH . '/vendor/composer/ClassLoader.php');
+require_once('vendor/j7mbo/twitter-api-php/TwitterAPIExchange.php');
  $loader = new Composer\Autoload\ClassLoader();
 
       // register classes with namespaces

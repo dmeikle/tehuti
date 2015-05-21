@@ -9,3 +9,6 @@ tokens:
 
 staff:
     component: "src/components/staff/config/routing.yml"    
+
+traffic:
+    component: "src/components/traffic/config/routing.yml"  

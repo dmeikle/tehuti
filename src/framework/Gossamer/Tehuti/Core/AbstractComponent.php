@@ -111,7 +111,7 @@ abstract class AbstractComponent {
                 return call_user_func_array(array(
                     $controller,
                     $method
-                        ), !isset($this->params) ? array() : $this->params);
+                        ), is_null($this->request->getParameters()) ? array() : $this->request->getParameters());
             } catch (\Exception $e) {
                 echo ($e->getMessage());
                 //TODO: this currently is only for the template view

@@ -25,6 +25,7 @@ class ResponseList extends Response{
         if(!is_null($responses)) {
             $this->responses = $responses;
         }
+       print_r($this->toArray());
     }
     
     public function add(Response $response) {

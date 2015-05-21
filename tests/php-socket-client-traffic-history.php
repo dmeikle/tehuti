@@ -26,16 +26,13 @@ class WebsocketClient
  
 	public function sendData($data)
 	{
-            ini_set('display_errors', 1); 
-error_reporting(E_ALL);
-//            $data = json_encode(array (
-//                'type' => 'usermsg',
-//		'name' => 'server2',
-//		'message' => 'this is a test',
-//		'color' => '#666666'
-//		));
-		$data = $this->getRequest();
-		
+            
+            $data = json_encode(array (
+                'type' => 'usermsg',
+		'name' => 'server2',
+		'message' => 'this is a test',
+		'color' => '#666666'
+		));
 		// send actual data:
 		fwrite($this->_Socket, "\x00" . $data . "\xff" ) or die('Error:' . $errno . ':' . $errstr); 
                // echo $data."\r\n";
@@ -47,11 +44,11 @@ error_reporting(E_ALL);
         private function getRequest() {
             $request = new ClientRequest();
             $request->setDate(strtolower("now"));
-            $request->setMessage("date time test on tehuti");
+            $request->setMessage("this is a new request object 1");
             $request->setPriorityLevel(1);
             $request->setSubject("testing the subject");
             $request->setTypeId(2);
-            $request->setStaffId(array(2));
+            $request->setStaffId(array(2,85));
             
             return json_encode($request->toArray());
         }
@@ -61,8 +58,8 @@ error_reporting(E_ALL);
 		$key2 = $this->_generateRandomString(32);
 		$key3 = $this->_generateRandomString(8, false, true);		
  
-		$header = "GET /staff/notify?12345 HTTP/1.1\r\n";
-		$header.= "Host: ".$host.":".$port."/staff/notify\r\n";
+		$header = "GET /traffic/updates/10?123 HTTP/1.1\r\n";
+		$header.= "Host: ".$host.":".$port."/traffic/updates/10\r\n";
                 $header.= "Message: " . $this->getRequest() . "\r\n";
 		$header.= "Connection: Upgrade\r\n";
                 $header.= "Pragma: no-cache\r\n";
@@ -135,7 +132,7 @@ error_reporting(E_ALL);
         }
 }
  echo "new websocket\r\n";
-$WebSocketClient = new WebsocketClient('192.168.2.252', 9001);
+$WebSocketClient = new WebsocketClient('192.168.2.252', 9000);
 
 echo "sending data\r\n";
 echo $WebSocketClient->sendData('1337');

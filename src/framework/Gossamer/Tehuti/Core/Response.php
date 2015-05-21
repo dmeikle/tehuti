@@ -48,7 +48,7 @@ class Response {
             $this->setPriorityLevel($message['priorityLevel']);
             $this->setRecipientList($message['staffId']);
             $this->setSubject($message['subject']);
-            $this->setTimestamp(strtotime("now"));
+            $this->setTimestamp(date("Y-m-dPDTh:iA"));
             $this->setTypeId($message['TickerTypes_id']);
         }
     }
@@ -156,7 +156,7 @@ class Response {
 
     public function toArray() {
         return array('type' => 'single', 'name' => 'server', 'message' => $this->message, 'color' => '#000000', 'typeId' => $this->typeId, 'subject' => $this->subject,
-            'date' => $this->timestamp, 'priority' => $this->priorityLevel, 'id' => $this->messageId);
+            'dateEntered' => $this->timestamp, 'priority' => $this->priorityLevel, 'id' => $this->messageId);
     }
 
 }

@@ -33,7 +33,7 @@ class SaveNotificationListener extends AbstractListener{
         $conn = $this->getConnection();
         //{"typeId":2,"subject":"testing the subject","message":"this is a new request object","date":"now","priorityLevel":1,"staffId":[2]}
         $params = $this->sanitize(json_decode($request->getHeader('Message'), true), $conn);
-      
+        $params['dateEntered'] = date('Y-m-d H:i:s');
         $cmd = new SaveCommand(new TickerFeed, null, $conn);        
         $result = $cmd->execute($params);
         

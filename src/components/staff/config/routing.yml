@@ -47,8 +47,6 @@ staff_connect:
         
 staff_list_notifications: 
     pattern: staff/history
-    listeners:
-     #  - { 'event': 'component_request_start', 'listener': 'components\staff\listeners\CheckStaffCredentialsListener' }
     defaults:
         component: components\staff\StaffComponent
         controller: components\staff\controllers\StaffController

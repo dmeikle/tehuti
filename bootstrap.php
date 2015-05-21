@@ -24,6 +24,9 @@ $container->set('Logger', null, $logger);
 $container->set('YamlParser', 'Gossamer\\Tehuti\\Utils\\YAMLParser', new Gossamer\Tehuti\Utils\YAMLParser($logger));
 $container->set('DBConnection', null, EntityManager::getInstance()->getConnection());
 
+$port = (is_array($argv) && count($argv) > 1) ? $argv[1] : null;
+    
+
 $kernel = new Kernel($container);
-$kernel->run(Kernel::DEBUG_MODE);
+$kernel->run(Kernel::DEBUG_MODE, $port);
 ?>

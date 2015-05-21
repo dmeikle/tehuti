@@ -107,7 +107,7 @@ class WebsocketClient
 	}
 }
  echo "new websocket\r\n";
-$WebSocketClient = new WebsocketClient('192.168.2.252', 9000);
+$WebSocketClient = new WebsocketClient('192.168.2.252', 9001);
 echo "sending data\r\n";
 echo $WebSocketClient->sendData('1337');
 echo "data sent\r\n";

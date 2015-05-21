@@ -46,7 +46,7 @@ logger:
 
 
 twitter:
-    oauth_access_token: 874094586-baTudjt9mnnLqDTKiBD3Ir2jhzmHrRR8HItGVWbS
-    oauth_access_token_secret: s5q9rrfJgJftVp3L73Fw5NVtKB2Rx5nAYiX2KMUyUuJmV
-    consumer_key: YMz5fs0XbKG6AQE3f5x9FxtX2
-    consumer_secret: iIaxj9XBN6OQVuoJx3scC6bGzA1nBzjDCBYdBH1sBB8kkC9R00
+    oauth_access_token: token
+    oauth_access_token_secret: secret
+    consumer_key: key
+    consumer_secret: secret

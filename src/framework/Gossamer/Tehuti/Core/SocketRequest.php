@@ -34,8 +34,7 @@ class SocketRequest extends Request {
     protected $verb;
     
     public function __construct($header) {
-        echo "construct socketrequest\r\n";
-       echo "new header:\r\n" . $header ."\r\n\r\n";
+      
         $this->parseHeader($header);
         $this->parseUri();
        
@@ -55,7 +54,7 @@ class SocketRequest extends Request {
 
         
     protected function setParameters($header) {
-       echo "setting parameters\r\n";
+      
         $lines = preg_split("/\r\n/", $header);
      
         $get = urldecode(array_shift($lines));
@@ -66,7 +65,7 @@ class SocketRequest extends Request {
 
             $this->token = array_pop($chunks);
             $this->uri = implode('/', $chunks);
-        print_r($chunks);
+    print_r($chunks);
             list($empty, $this->component, $this->verb, $parameter) = array_pad(explode('/', current($chunks)),4,null);
             $this->parameters = array($parameter);
         }

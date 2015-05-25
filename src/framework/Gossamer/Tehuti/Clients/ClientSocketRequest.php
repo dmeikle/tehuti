@@ -26,7 +26,7 @@ class ClientSocketRequest extends SocketRequest {
     private $requestParameters;
     
     public function __construct($clientId, $receivedText) {
-       echo "construct clientrequestsocket\r\n";
+     
         $this->clientId = $clientId;
         
         $header = $this->parseHeader($receivedText);
@@ -50,13 +50,13 @@ class ClientSocketRequest extends SocketRequest {
     }
     
     protected function setParameters($header) {
-       echo "setting parameters\r\n";
+    
         $lines = preg_split("/\r\n/", $header);
      
         $get = urldecode(array_shift($lines));
         $pieces = explode(' ', $get);
         $list = json_decode($pieces[0], true);
-       
+    
         $this->uri = $list['uri'];        
 
         $this->parameters = array($list['rows']);        

@@ -24,12 +24,16 @@ class TrafficModel extends AbstractModel {
     
 
     public function getTraffic($numRows) {
+        $config = $this->getCredentials();
         
-        $url = 'https://api.twitter.com/1.1/statuses/user_timeline.json';
-        $getfield = '?screen_name=am730traffic&count=' . $numRows;
-        $requestMethod = 'GET';
+        $url = $config['connection']['url'];
+        $count = $config['connection']['count'];
+        $screenName = $config['connection']['screen_name'];
+        $requestMethod = $config['connection']['method'];
+        
+        $getfield = "?screen_name=$screenName&count=$count";
 
-        $twitter = new TwitterAPIExchange($this->getCredentials());
+        $twitter = new TwitterAPIExchange($config['credentials']);
 
 
         $string = json_decode($twitter->setGetfield($getfield)
@@ -42,7 +46,33 @@ class TrafficModel extends AbstractModel {
 
         }
         
-        return $string;
+        return array_reverse($string);
+    }
+    
+    public function getTrafficUpdates($lastRow) {
+        $config = $this->getCredentials();
+      
+        $url = $config['connection']['url'];
+        $count = $config['connection']['count'];
+        $screenName = $config['connection']['screen_name'];
+        $requestMethod = $config['connection']['method'];
+        
+        $getfield = "?screen_name=$screenName&count=$count";
+
+        $twitter = new TwitterAPIExchange($config['credentials']);
+        //lastrow slicing is not implemented - may not be needed
+
+        $string = json_decode($twitter->setGetfield($getfield)
+                 ->buildOauth($url, $requestMethod)
+                 ->performRequest(),$assoc = TRUE);    
+
+        if(array_key_exists('errors', $string) && $string["errors"][0]["message"] != "") {
+            echo "<h3>Sorry, there was a problem.</h3><p>Twitter returned the following error message:</p><p><em>".$string[errors][0]["message"]."</em></p>";
+            exit();
+
+        }
+        
+        return array_reverse($string);
     }
     
     private function getCredentials() {

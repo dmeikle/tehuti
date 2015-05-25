@@ -1,6 +1,6 @@
 
-admin_traffic_updates:
-    pattern: traffic/updates/*
+admin_traffic_list:
+    pattern: traffic/list/*
     defaults:
         component: components\traffic\TrafficComponent
         controller: components\traffic\controllers\TrafficController
@@ -10,3 +10,14 @@ admin_traffic_updates:
         viewKey: admin_traffic_updates
 #        datasource: datasource1
  
+ 
+admin_traffic_updates:
+    pattern: traffic/updates/*
+    defaults:
+        component: components\traffic\TrafficComponent
+        controller: components\traffic\controllers\TrafficController
+        model: components\traffic\models\TrafficModel
+        method: getTrafficUpdates
+        view: Gossamer\Tehuti\Core\ClientView
+        viewKey: admin_traffic_updates
+#        datasource: datasource1 

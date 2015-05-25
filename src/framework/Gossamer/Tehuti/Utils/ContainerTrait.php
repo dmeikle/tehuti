@@ -22,7 +22,7 @@ trait ContainerTrait {
     
     protected $container;
     
-    public function setContainer(Container $container) {
+    public function setContainer(Container &$container) {
         $this->container = $container;
     }
     

@@ -18,18 +18,19 @@ namespace components\traffic\serialization;
 class TwitterSerializer {
     
     public function formatResults(array $result = null) {
+       
         if(is_null($result)) {
             return array();
         }
         $retval = array();
      
         foreach($result as $value) {
-          
+            
             if(!array_key_exists('created_at', $value)) {
                 continue;
             }
             $date = strtotime($value['created_at']);
-            
+      
             //$tmp['dateEntered'] = date("F j \<\b\\r\>h:iA", $date);
            // $tmp['date'] = date("F j \<\b\\r\>h:iA", $date);
             $tmp['dateEntered'] = date("y-m-d h:i:s", $date);
@@ -38,9 +39,10 @@ class TwitterSerializer {
             $tmp['message'] = $value['text'];
             $tmp['priorityLevel'] = 1;
             $tmp['TickerTypes_id'] = 3;
-            $retval[] = $tmp;
+         
+            $retval[$value['id']] = $tmp;
         }
-        
+      
         return $retval;
     }
 }

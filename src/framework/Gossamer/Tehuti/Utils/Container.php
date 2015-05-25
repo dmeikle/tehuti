@@ -31,15 +31,11 @@ class Container {
      * 
      * @throws ObjectNotFoundException
      */
-    public function get($key, $defaultType = null) {
+    public function get($key) {
         $directory = $this->getDirectory();
 
         if (!array_key_exists($key, $directory)) {
-            if (is_null($defaultType)) {
-                throw new ObjectNotFoundException($key . ' does not exist in container');
-            }
-            
-            return $defaultType;
+            throw new ObjectNotFoundException($key . ' does not exist in container');
         }
 
         $item = $directory[$key];
@@ -76,7 +72,9 @@ class Container {
      */
     public function set($key, $objectPath = null, &$object = null) {
         $directory = $this->getDirectory();
-        $directory[$key] = array('objectPath' => $objectPath, 'object' => $object);
+        if(!array_key_exists($key, $directory)) {
+            $directory[$key] = array('objectPath' => $objectPath, 'object' => $object);
+        }
         $this->directory = $directory;
     }
 

@@ -42,6 +42,7 @@ class Response {
     
     
     public function __construct(array $message = null) {
+        
         if(!is_null($message)) {
             $this->setMessageId($message['messageId']);
             $this->setMessage($message['message']);

@@ -78,8 +78,13 @@ class Server {
         socket_set_option($socket, SOL_SOCKET, SO_REUSEADDR, 1);
 
         //bind socket to specified host
-        socket_bind($socket, 0, $this->port);
-
+        $socketSuccess = @socket_bind($socket, 0, $this->port);
+        if(!$socketSuccess) {
+            //throw new \Gossamer\Tehuti\Exceptions\PortNotAvailableException($this->port . " is already in use by another service\r\n");
+            
+            $this->log("port #" .$this->port . " is already in use by another service\r\n");
+            die();
+        }
         //listen to port
         socket_listen($socket);
 

@@ -57,7 +57,7 @@ class TrafficController extends AbstractController {
         $this->container->get('TrafficFeed')->addUpdate($list);
 
         $list = $this->container->get('TrafficFeed')->getMostRecentRows($lastRow);
-        
+        print_r($list);
         return $this->view->renderList($this->request->getClientId(), $list);
     }
 

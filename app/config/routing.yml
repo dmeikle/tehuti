@@ -12,3 +12,6 @@ staff:
 
 traffic:
     component: "src/components/traffic/config/routing.yml"  
+    
+messaging:
+    component: "src/components/messaging/config/routing.yml"  

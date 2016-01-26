@@ -1,0 +1,14 @@
+
+
+messaging_notifications:
+    pattern: messaging/notifications/*
+    listeners:
+    #    - { 'event': 'component_request_start', 'listener': 'components\staff\listeners\StaffListener', 'datasource': 'mysql' }
+    defaults:
+        component: components\messaging\MessagingComponent
+        controller: components\messaging\controllers\MessagingController
+        model: components\messaging\models\MessagingModel
+        view: Gossamer\Tehuti\Core\ServerView
+        method: getNewMessages
+        datasource: datasource1
+    

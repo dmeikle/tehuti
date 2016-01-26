@@ -9,13 +9,15 @@
  *  file that was distributed with this source code.
  */
 
-namespace Gossamer\Tehuti\Database;
+namespace components\messaging;
+
+use Gossamer\Tehuti\Core\AbstractComponent;
 
 /**
- * DataSourceInterface
+ * MessagingComponent
  *
  * @author Dave Meikle
  */
-interface DataSourceInterface {
+class MessagingComponent extends AbstractComponent {
 
 }
